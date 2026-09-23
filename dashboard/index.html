@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-[#070b19] text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cultural Voyagers — Birthday Ledger</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter & Playfair Display -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,800;1,400&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Canvas Confetti for Birthday Celebrations -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              dark: '#070b19',
+              card: 'rgba(15, 23, 42, 0.75)',
+              gold: '#f59e0b',
+              goldGlow: '#fbbf24',
+              orange: '#f97316',
+              accent: '#38bdf8',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            serif: ['Playfair Display', 'serif'],
+          },
+          boxShadow: {
+            'glow-gold': '0 0 25px -5px rgba(245, 158, 11, 0.4)',
+            'glow-logo': '0 0 35px 2px rgba(249, 115, 22, 0.35)',
+            'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom scrollbar and glassmorphism touches */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #070b19;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1e293b;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #f59e0b;
+    }
+
+    .glass-card {
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .stamp-card {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
+      border: 2px dashed rgba(245, 158, 11, 0.4);
+      position: relative;
+    }
+    
+    .stamp-card::before, .stamp-card::after {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background-color: #070b19;
+      border-radius: 50%;
+    }
+    .stamp-card::before { left: -10px; top: 50%; transform: translateY(-50%); }
+    .stamp-card::after { right: -10px; top: 50%; transform: translateY(-50%); }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-6px) rotate(1deg); }
+    }
+    .floating-logo {
+      animation: float 6s ease-in-out infinite;
+    }
+  </style>
+</head>
+
+<body class="h-full min-h-screen bg-[#070b19] text-slate-100 flex flex-col font-sans selection:bg-amber-500 selection:text-black">
+
+  <!-- Top Navigation & Brand Header -->
+  <header class="sticky top-0 z-40 border-b border-slate-800/80 bg-[#070b19]/90 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        
+        <!-- Brand Logo & Title -->
+        <div class="flex items-center space-x-4">
+          <div class="relative group cursor-pointer" onclick="triggerLogoAnimation()">
+            <div class="absolute -inset-1 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full blur opacity-60 group-hover:opacity-100 transition duration-500"></div>
+            <img 
+              src="logo.png" 
+              alt="Cultural Voyagers Logo" 
+              class="relative w-14 h-14 rounded-full object-cover border-2 border-amber-400/80 shadow-glow-logo floating-logo bg-slate-900"
+              onerror="this.onerror=null; this.src='https://placehold.co/100x100/1e293b/f59e0b?text=CV';"
+            >
+          </div>
+          <div>
+            <div class="flex items-center space-x-2">
+              <h1 class="font-serif text-xl sm:text-2xl font-bold tracking-tight text-white">
+                CULTURAL VOYAGERS
+              </h1>
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/30">
+                Ledger
+              </span>
+            </div>
+            <p class="text-xs text-slate-400 hidden sm:block">
+              Luxury Travel Client Birthday & Special Occasion Registry
+            </p>
+          </div>
+        </div>
+
+        <!-- Quick Stats Banner / Action Button -->
+        <div class="flex items-center space-x-3">
+          <button 
+            onclick="scrollToForm()"
+            class="hidden sm:inline-flex items-center px-4 py-2 rounded-xl text-sm font-semibold text-slate-900 bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-300 hover:to-orange-300 shadow-glow-gold hover:scale-105 transition duration-200"
+          >
+            <i class="fa-solid font-bold fa-plus mr-2"></i> Add Voyager
+          </button>
+          
+          <button 
+            onclick="showNotification('Database synchronized with local storage', 'info')"
+            class="p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white transition border border-slate-700/60"
+            title="Sync Ledger"
+          >
+            <i class="fa-solid fa-arrows-rotate text-sm"></i>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Layout -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+    <!-- KPI Overview Section -->
+    <section class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+      <!-- Total Ledger Card -->
+      <div class="glass-card rounded-2xl p-6 relative overflow-hidden group hover:border-slate-700 transition">
+        <div class="absolute -right-4 -bottom-4 opacity-10 group-hover:opacity-20 transition duration-300">
+          <i class="fa-solid fa-users text-8xl text-slate-100"></i>
+        </div>
+        <div class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">Total Voyagers</div>
+        <div class="flex items-baseline space-x-3">
+          <span id="kpiTotalCount" class="text-4xl font-extrabold text-white">0</span>
+          <span class="text-xs text-slate-400 font-medium">Registered Records</span>
+        </div>
+        <div class="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
+          <span>Active Accounts</span>
+          <span class="text-emerald-400 font-semibold"><i class="fa-solid fa-circle text-[8px] mr-1"></i> Sync Live</span>
+        </div>
+      </div>
+
+      <!-- Celebrating Today Card -->
+      <div class="glass-card rounded-2xl p-6 relative overflow-hidden group border border-amber-500/30 hover:border-amber-500/60 transition shadow-glow-gold">
+        <div class="absolute -right-4 -bottom-4 opacity-10 group-hover:opacity-25 transition duration-300">
+          <i class="fa-solid fa-cake-candles text-8xl text-amber-400"></i>
+        </div>
+        <div class="text-amber-400 text-xs font-bold uppercase tracking-wider mb-1 flex items-center justify-between">
+          <span>Celebrating Today</span>
+          <span class="animate-pulse flex h-2 w-2 rounded-full bg-amber-400"></span>
+        </div>
+        <div class="flex items-baseline space-x-3">
+          <span id="kpiTodayCount" class="text-4xl font-extrabold text-amber-300">0</span>
+          <span class="text-xs text-amber-200/80 font-medium">Voyager Birthdays</span>
+        </div>
+        <div class="mt-4 pt-3 border-t border-amber-500/20 flex items-center justify-between text-xs text-amber-300/80">
+          <span>Action Required</span>
+          <button onclick="triggerConfetti()" class="hover:underline text-amber-400 font-medium">
+            <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Celebrate
+          </button>
+        </div>
+      </div>
+
+      <!-- Upcoming (7 Days) Card -->
+      <div class="glass-card rounded-2xl p-6 relative overflow-hidden group hover:border-slate-700 transition">
+        <div class="absolute -right-4 -bottom-4 opacity-10 group-hover:opacity-20 transition duration-300">
+          <i class="fa-solid fa-calendar-week text-8xl text-sky-400"></i>
+        </div>
+        <div class="text-sky-400 text-xs font-bold uppercase tracking-wider mb-1">Upcoming (Next 7 Days)</div>
+        <div class="flex items-baseline space-x-3">
+          <span id="kpiUpcomingCount" class="text-4xl font-extrabold text-white">0</span>
+          <span class="text-xs text-slate-400 font-medium">Imminent Celebrations</span>
+        </div>
+        <div class="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
+          <span>Next 7 Days</span>
+          <span class="text-sky-400 font-medium"><i class="fa-solid fa-clock-rotate-left mr-1"></i> Auto-Calculated</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Celebrating Today Spotlight Banner -->
+    <section id="todaySpotlightSection" class="space-y-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+          <div class="w-3 h-3 rounded-full bg-amber-500 animate-ping"></div>
+          <h2 class="font-serif text-xl font-bold text-white tracking-wide">
+            TODAY'S SPECIAL CELEBRATIONS
+          </h2>
+        </div>
+        <span class="text-xs text-amber-400/90 font-mono bg-amber-500/10 border border-amber-500/20 px-3 py-1 rounded-full">
+          <i class="fa-solid fa-gift mr-1"></i> PKR 5,000 Travel Voucher Eligible
+        </span>
+      </div>
+
+      <!-- Grid for Passport Stamp Cards -->
+      <div id="todaySpotlightGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Rendered dynamically via JS -->
+      </div>
+    </section>
+
+    <!-- Records Directory Header & Filter Toolbar -->
+    <section class="glass-card rounded-2xl p-6 space-y-6">
+      
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-5">
+        <div>
+          <h2 class="font-serif text-xl font-bold text-white">Voyager Records Ledger</h2>
+          <p class="text-xs text-slate-400 mt-0.5">Filter, search, and generate client birthday vouchers & invites.</p>
+        </div>
+
+        <!-- Search input & Category Tabs -->
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+          <div class="relative min-w-[240px]">
+            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+            <input 
+              type="text" 
+              id="searchInput"
+              oninput="filterRecords()"
+              placeholder="Search name, email..." 
+              class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl pl-9 pr-4 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500 transition"
+            >
+          </div>
+
+          <!-- Quick Category Filters -->
+          <div class="flex items-center bg-slate-900/90 p-1 rounded-xl border border-slate-800 text-xs">
+            <button onclick="setFilterCategory('ALL')" id="filterBtnALL" class="filter-tab px-3 py-1.5 rounded-lg font-medium transition bg-amber-500 text-slate-950 font-semibold">
+              All
+            </button>
+            <button onclick="setFilterCategory('TODAY')" id="filterBtnTODAY" class="filter-tab px-3 py-1.5 rounded-lg font-medium transition text-slate-400 hover:text-white">
+              Today 🎉
+            </button>
+            <button onclick="setFilterCategory('UPCOMING')" id="filterBtnUPCOMING" class="filter-tab px-3 py-1.5 rounded-lg font-medium transition text-slate-400 hover:text-white">
+              Upcoming
+            </button>
+            <button onclick="setFilterCategory('Client')" id="filterBtnClient" class="filter-tab px-3 py-1.5 rounded-lg font-medium transition text-slate-400 hover:text-white">
+              Clients
+            </button>
+            <button onclick="setFilterCategory('Staff')" id="filterBtnStaff" class="filter-tab px-3 py-1.5 rounded-lg font-medium transition text-slate-400 hover:text-white">
+              Staff
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Data Table -->
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm text-slate-300">
+          <thead class="bg-slate-900/80 text-xs uppercase tracking-wider text-slate-400 border-b border-slate-800">
+            <tr>
+              <th scope="col" class="py-3.5 px-4 font-semibold">Voyager Name</th>
+              <th scope="col" class="py-3.5 px-4 font-semibold">Contact Email</th>
+              <th scope="col" class="py-3.5 px-4 font-semibold">Category</th>
+              <th scope="col" class="py-3.5 px-4 font-semibold">Date of Birth</th>
+              <th scope="col" class="py-3.5 px-4 font-semibold">Days Until</th>
+              <th scope="col" class="py-3.5 px-4 font-semibold text-right">Quick Actions</th>
+            </tr>
+          </thead>
+          <tbody id="recordsTableBody" class="divide-y divide-slate-800/60 font-sans">
+            <!-- Dynamic table rows generated via JavaScript -->
+          </tbody>
+        </table>
+
+        <!-- Empty State Container -->
+        <div id="emptyState" class="hidden py-12 text-center">
+          <div class="w-16 h-16 mx-auto mb-3 rounded-full bg-slate-800/80 flex items-center justify-center text-slate-500 text-xl">
+            <i class="fa-solid fa-folder-open"></i>
+          </div>
+          <h3 class="text-sm font-semibold text-slate-300">No records found</h3>
+          <p class="text-xs text-slate-500 mt-1">Try adjusting your search filter or add a new voyager below.</p>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Form Section: Log New Voyager -->
+    <section id="addFormSection" class="glass-card rounded-2xl p-6 space-y-6">
+      <div class="border-b border-slate-800 pb-4 flex items-center justify-between">
+        <div>
+          <h2 class="font-serif text-xl font-bold text-white">Add New Voyager Record</h2>
+          <p class="text-xs text-slate-400 mt-0.5">Register a new client, staff, or partner into the Cultural Voyagers birthday system.</p>
+        </div>
+        <span class="text-xs text-slate-500 bg-slate-800 px-2.5 py-1 rounded-lg">
+          <i class="fa-solid fa-shield-halved mr-1 text-emerald-400"></i> Encrypted Local Storage
+        </span>
+      </div>
+
+      <form id="addVoyagerForm" onsubmit="handleFormSubmit(event)" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        
+        <!-- Full Name -->
+        <div class="space-y-1.5">
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wide" for="inputName">
+            Full Name <span class="text-amber-400">*</span>
+          </label>
+          <div class="relative">
+            <i class="fa-solid fa-user absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+            <input 
+              type="text" 
+              id="inputName" 
+              required
+              placeholder="e.g. Sanober Khan" 
+              class="w-full bg-slate-900 border border-slate-700/80 rounded-xl pl-9 pr-4 py-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500 transition"
+            >
+          </div>
+        </div>
+
+        <!-- Email Address -->
+        <div class="space-y-1.5">
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wide" for="inputEmail">
+            Email Address <span class="text-amber-400">*</span>
+          </label>
+          <div class="relative">
+            <i class="fa-solid fa-envelope absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+            <input 
+              type="email" 
+              id="inputEmail" 
+              required
+              placeholder="e.g. sanober@culturalvoyagers.com" 
+              class="w-full bg-slate-900 border border-slate-700/80 rounded-xl pl-9 pr-4 py-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500 transition"
+            >
+          </div>
+        </div>
+
+        <!-- Date of Birth -->
+        <div class="space-y-1.5">
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wide" for="inputDob">
+            Date of Birth <span class="text-amber-400">*</span>
+          </label>
+          <div class="relative">
+            <input 
+              type="date" 
+              id="inputDob" 
+              required
+              class="w-full bg-slate-900 border border-slate-700/80 rounded-xl px-4 py-2 text-xs text-slate-100 focus:outline-none focus:border-amber-500 transition [color-scheme:dark]"
+            >
+          </div>
+        </div>
+
+        <!-- Category -->
+        <div class="space-y-1.5">
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wide" for="inputCategory">
+            Category / Relation <span class="text-amber-400">*</span>
+          </label>
+          <div class="relative">
+            <select 
+              id="inputCategory" 
+              required
+              class="w-full bg-slate-900 border border-slate-700/80 rounded-xl px-4 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-amber-500 transition"
+            >
+              <option value="Client">VIP Client</option>
+              <option value="Staff">Team / Staff</option>
+              <option value="Partner">Travel Partner</option>
+              <option value="Family">Family & Friend</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Submit & Reset Buttons -->
+        <div class="md:col-span-2 flex items-center justify-end space-x-3 pt-2">
+          <button 
+            type="button" 
+            onclick="resetForm()"
+            class="px-5 py-2.5 rounded-xl border border-slate-700 text-xs font-semibold text-slate-300 hover:bg-slate-800 transition"
+          >
+            Clear Form
+          </button>
+          
+          <button 
+            type="submit" 
+            class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-300 hover:to-orange-300 text-slate-950 font-semibold text-xs shadow-glow-gold hover:scale-105 transition duration-200"
+          >
+            <i class="fa-solid fa-floppy-disk mr-1.5"></i> Save Record
+          </button>
+        </div>
+
+      </form>
+    </section>
+
+  </main>
+
+  <!-- Slide-out Modal Drawer for Personalized Invites & Vouchers -->
+  <div id="drawerOverlay" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden transition-opacity duration-300" onclick="closeDrawer()">
+    <div 
+      id="drawerContainer" 
+      class="fixed inset-y-0 right-0 max-w-md w-full bg-[#0b1329] border-l border-slate-800 p-6 shadow-2xl flex flex-col justify-between overflow-y-auto transform translate-x-full transition-transform duration-300"
+      onclick="event.stopPropagation()"
+    >
+      <div>
+        <!-- Drawer Header -->
+        <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+              <i class="fa-solid fa-paper-plane text-lg"></i>
+            </div>
+            <div>
+              <h3 class="font-serif font-bold text-lg text-white">GENERATE INVITE</h3>
+              <p class="text-xs text-slate-400">Cultural Voyagers Birthday Voucher</p>
+            </div>
+          </div>
+          <button onclick="closeDrawer()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition">
+            <i class="fa-solid fa-xmark text-lg"></i>
+          </button>
+        </div>
+
+        <!-- Drawer Body Content -->
+        <div class="mt-6 space-y-5">
+          <!-- Recipient Badge -->
+          <div class="bg-slate-900/90 rounded-xl p-3.5 border border-slate-800 flex items-center space-x-3">
+            <div id="drawerAvatar" class="w-10 h-10 rounded-full bg-gradient-to-tr from-amber-500 to-orange-400 text-slate-950 font-bold flex items-center justify-center text-sm">
+              CV
+            </div>
+            <div>
+              <p id="drawerRecipientName" class="text-sm font-bold text-white">Recipient Name</p>
+              <p id="drawerRecipientEmail" class="text-xs text-slate-400">recipient@email.com</p>
+            </div>
+          </div>
+
+          <!-- Personalized Invitation Letter Template -->
+          <div class="space-y-1.5">
+            <label class="text-xs font-semibold text-slate-300 uppercase tracking-wide">Invitation Template</label>
+            <div id="drawerLetterPreview" class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 text-xs text-slate-300 space-y-2 leading-relaxed font-sans">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <!-- Shareable Dynamic Link -->
+          <div class="space-y-1.5">
+            <label class="text-xs font-semibold text-slate-300 uppercase tracking-wide">Shareable Link</label>
+            <div class="flex items-center space-x-2">
+              <input 
+                type="text" 
+                id="drawerShareLink" 
+                readonly 
+                class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-amber-400 font-mono focus:outline-none"
+              >
+              <button 
+                onclick="copyToClipboard('drawerShareLink', 'Link Copied!')"
+                class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition border border-slate-700"
+              >
+                COPY LINK
+              </button>
+            </div>
+          </div>
+
+          <!-- Voucher Code Box -->
+          <div class="space-y-1.5">
+            <label class="text-xs font-semibold text-slate-300 uppercase tracking-wide">Exclusive Birthday Voucher</label>
+            <div class="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/30 rounded-xl p-4 text-center space-y-2">
+              <span class="text-xs text-amber-400 font-semibold uppercase tracking-wider block">Complimentary Luxury Upgrade</span>
+              <div id="drawerVoucherCode" class="text-2xl font-mono font-extrabold text-amber-300 tracking-widest">
+                VOYAGER2026
+              </div>
+              <p class="text-[11px] text-slate-400">Valid for PKR 5,000 credit on any international voyage booking.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Drawer Footer Actions -->
+      <div class="pt-6 border-t border-slate-800 space-y-2">
+        <button 
+          onclick="copyToClipboard('drawerVoucherCode', 'PKR 5,000 Voucher Code Copied!')"
+          class="w-full py-3 rounded-xl bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-300 hover:to-orange-300 text-slate-950 font-bold text-xs uppercase tracking-wider shadow-glow-gold transition"
+        >
+          <i class="fa-solid fa-ticket mr-1.5"></i> COPY PKR 5,000 VOUCHER
+        </button>
+        <button 
+          onclick="closeDrawer()" 
+          class="w-full py-2.5 rounded-xl border border-slate-800 text-slate-400 hover:text-white text-xs font-semibold transition"
+        >
+          Close Drawer
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification Toast Message Box -->
+  <div id="toastNotification" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+    <div class="bg-slate-900 border border-amber-500/50 text-slate-100 px-4 py-3 rounded-xl shadow-2xl flex items-center space-x-3">
+      <div id="toastIcon" class="text-amber-400"><i class="fa-solid fa-circle-check"></i></div>
+      <div id="toastMessage" class="text-xs font-semibold">Notification text</div>
+    </div>
+  </div>
+
+  <script>
+    // Initial Default Seed Data
+    const INITIAL_VOYAGERS = [
+      { id: '1', name: 'Sanober K.', email: 'sanoberk@gmail.com', dob: getTodayFormatted(0), category: 'VIP Client' },
+      { id: '2', name: 'Omar R.', email: 'omarr@gmail.com', dob: getTodayFormatted(0), category: 'VIP Client' },
+      { id: '3', name: 'Nadhir A.', email: 'nadh@gmail.com', dob: getTodayFormatted(3), category: 'Family' },
+      { id: '4', name: 'Darxin M.', email: 'darxiin@gmail.com', dob: getTodayFormatted(6), category: 'Staff' },
+      { id: '5', name: 'Nimra S.', email: 'nim@gmail.com', dob: '1995-11-14', category: 'Travel Partner' },
+    ];
+
+    let currentCategoryFilter = 'ALL';
+    let currentEditingId = null;
+
+    // Utility: Format date for offsets relative to today
+    function getTodayFormatted(offsetDays = 0) {
+      const today = new Date();
+      today.setDate(today.getDate() + offsetDays);
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const dd = String(today.getDate()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd}`;
+    }
+
+    // Initialize State from LocalStorage
+    function getStoredRecords() {
+      const stored = localStorage.getItem('cultural_voyagers_ledger');
+      if (!stored) {
+        localStorage.setItem('cultural_voyagers_ledger', JSON.stringify(INITIAL_VOYAGERS));
+        return INITIAL_VOYAGERS;
+      }
+      try {
+        return JSON.parse(stored);
+      } catch (e) {
+        return INITIAL_VOYAGERS;
+      }
+    }
+
+    function saveStoredRecords(records) {
+      localStorage.setItem('cultural_voyagers_ledger', JSON.stringify(records));
+      renderApp();
+    }
+
+    // Calculate days remaining until next birthday
+    function calculateDaysLeft(dobString) {
+      if (!dobString) return 999;
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const dob = new Date(dobString);
+      const currentYear = today.getFullYear();
+
+      let nextBday = new Date(currentYear, dob.getMonth(), dob.getDate());
+      nextBday.setHours(0, 0, 0, 0);
+
+      if (nextBday < today) {
+        nextBday.setFullYear(currentYear + 1);
+      }
+
+      const diffTime = nextBday - today;
+      return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    }
+
+    // Render Entire Application View
+    function renderApp() {
+      const records = getStoredRecords();
+
+      // Sort records by nearest birthday
+      records.sort((a, b) => calculateDaysLeft(a.dob) - calculateDaysLeft(b.dob));
+
+      renderKPIs(records);
+      renderTodaySpotlight(records);
+      renderTable(records);
+    }
+
+    function renderKPIs(records) {
+      const total = records.length;
+      const todayCount = records.filter(r => calculateDaysLeft(r.dob) === 0).length;
+      const upcomingCount = records.filter(r => {
+        const days = calculateDaysLeft(r.dob);
+        return days > 0 && days <= 7;
+      }).length;
+
+      document.getElementById('kpiTotalCount').innerText = total;
+      document.getElementById('kpiTodayCount').innerText = todayCount;
+      document.getElementById('kpiUpcomingCount').innerText = upcomingCount;
+    }
+
+    // Render Today's Spotlight Cards (Passport Stamp Format)
+    function renderTodaySpotlight(records) {
+      const container = document.getElementById('todaySpotlightGrid');
+      const todayRecords = records.filter(r => calculateDaysLeft(r.dob) === 0);
+
+      if (todayRecords.length === 0) {
+        container.innerHTML = `
+          <div class="col-span-1 md:col-span-2 glass-card rounded-2xl p-6 text-center text-slate-400 text-xs">
+            <i class="fa-solid fa-umbrella-beach text-amber-400 text-2xl mb-2 block"></i>
+            No birthdays scheduled for today. Check upcoming celebrations below!
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = todayRecords.map(r => `
+        <div class="stamp-card rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div class="flex items-center space-x-4">
+            <div class="relative">
+              <div class="w-14 h-14 rounded-full bg-gradient-to-tr from-amber-400 to-orange-500 flex items-center justify-center font-bold text-slate-950 text-lg shadow-md">
+                ${r.name.substring(0, 2).toUpperCase()}
+              </div>
+              <span class="absolute -bottom-1 -right-1 bg-amber-400 text-slate-950 text-[10px] font-extrabold px-1.5 py-0.5 rounded-full uppercase">
+                Stamp
+              </span>
+            </div>
+            <div>
+              <h3 class="font-serif font-bold text-white text-base">${r.name}</h3>
+              <p class="text-xs text-slate-400">${r.email}</p>
+              <div class="flex items-center space-x-2 mt-1">
+                <span class="text-[11px] font-semibold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20">
+                  ${r.category}
+                </span>
+                <span class="text-[11px] text-slate-400">
+                  DOB: ${formatDateDisplay(r.dob)}
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="flex sm:flex-col gap-2 w-full sm:w-auto">
+            <button 
+              onclick="openInviteDrawer('${r.id}')"
+              class="flex-1 sm:flex-none px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs shadow-glow-gold transition"
+            >
+              <i class="fa-solid fa-paper-plane mr-1"></i> SEND WISH
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderTable(records) {
+      const tbody = document.getElementById('recordsTableBody');
+      const emptyState = document.getElementById('emptyState');
+      const searchVal = document.getElementById('searchInput').value.toLowerCase().trim();
+
+      const filtered = records.filter(r => {
+        const matchesSearch = r.name.toLowerCase().includes(searchVal) || r.email.toLowerCase().includes(searchVal);
+        
+        const daysLeft = calculateDaysLeft(r.dob);
+        let matchesCategory = true;
+
+        if (currentCategoryFilter === 'TODAY') {
+          matchesCategory = daysLeft === 0;
+        } else if (currentCategoryFilter === 'UPCOMING') {
+          matchesCategory = daysLeft > 0 && daysLeft <= 7;
+        } else if (currentCategoryFilter !== 'ALL') {
+          matchesCategory = r.category.toLowerCase() === currentCategoryFilter.toLowerCase();
+        }
+
+        return matchesSearch && matchesCategory;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        return;
+      }
+
+      emptyState.classList.add('hidden');
+
+      tbody.innerHTML = filtered.map(r => {
+        const daysLeft = calculateDaysLeft(r.dob);
+        let statusBadge = '';
+
+        if (daysLeft === 0) {
+          statusBadge = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-extrabold bg-amber-500 text-slate-950 animate-pulse"><i class="fa-solid fa-cake-candles mr-1"></i> Today!</span>`;
+        } else if (daysLeft <= 7) {
+          statusBadge = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-sky-500/20 text-sky-300 border border-sky-500/30">${daysLeft} days left</span>`;
+        } else {
+          statusBadge = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-normal text-slate-400 bg-slate-800/80">${daysLeft} days</span>`;
+        }
+
+        return `
+          <tr class="hover:bg-slate-800/40 transition">
+            <td class="py-3.5 px-4 font-semibold text-slate-100 flex items-center space-x-3">
+              <div class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xs text-amber-400 font-bold">
+                ${r.name.charAt(0)}
+              </div>
+              <span>${r.name}</span>
+            </td>
+            <td class="py-3.5 px-4 text-xs text-slate-400 font-mono">${r.email}</td>
+            <td class="py-3.5 px-4 text-xs">
+              <span class="px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 border border-slate-700/60 font-medium">
+                ${r.category}
+              </span>
+            </td>
+            <td class="py-3.5 px-4 text-xs text-slate-300">${formatDateDisplay(r.dob)}</td>
+            <td class="py-3.5 px-4 text-xs">${statusBadge}</td>
+            <td class="py-3.5 px-4 text-xs text-right space-x-1.5">
+              <button 
+                onclick="openInviteDrawer('${r.id}')" 
+                class="px-2.5 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold transition"
+                title="Generate Personal Link & Voucher"
+              >
+                GENERATE INVITE
+              </button>
+              <button 
+                onclick="copyVoucherQuick('${r.name}')" 
+                class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 font-medium transition"
+                title="Copy PKR 5,000 Voucher"
+              >
+                COPY VOUCHER
+              </button>
+              <button 
+                onclick="editRecord('${r.id}')" 
+                class="p-1.5 rounded-lg text-slate-400 hover:text-amber-400 hover:bg-slate-800 transition"
+                title="Edit Record"
+              >
+                <i class="fa-solid fa-pen"></i>
+              </button>
+              <button 
+                onclick="deleteRecord('${r.id}')" 
+                class="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition"
+                title="Delete Record"
+              >
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // Form Handling & LocalStorage Mutations
+    function handleFormSubmit(event) {
+      event.preventDefault();
+
+      const name = document.getElementById('inputName').value.trim();
+      const email = document.getElementById('inputEmail').value.trim();
+      const dob = document.getElementById('inputDob').value;
+      const category = document.getElementById('inputCategory').value;
+
+      let records = getStoredRecords();
+
+      if (currentEditingId) {
+        records = records.map(r => r.id === currentEditingId ? { id: currentEditingId, name, email, dob, category } : r);
+        showNotification(`Updated voyager record for ${name}`, 'success');
+        currentEditingId = null;
+      } else {
+        const newRecord = {
+          id: Date.now().toString(),
+          name,
+          email,
+          dob,
+          category
+        };
+        records.push(newRecord);
+        showNotification(`Added ${name} to Birthday Ledger`, 'success');
+      }
+
+      saveStoredRecords(records);
+      resetForm();
+    }
+
+    function editRecord(id) {
+      const records = getStoredRecords();
+      const target = records.find(r => r.id === id);
+      if (!target) return;
+
+      document.getElementById('inputName').value = target.name;
+      document.getElementById('inputEmail').value = target.email;
+      document.getElementById('inputDob').value = target.dob;
+      document.getElementById('inputCategory').value = target.category;
+
+      currentEditingId = id;
+      scrollToForm();
+      showNotification(`Editing record for ${target.name}`, 'info');
+    }
+
+    function deleteRecord(id) {
+      const records = getStoredRecords();
+      const target = records.find(r => r.id === id);
+      if (!target) return;
+
+      const filtered = records.filter(r => r.id !== id);
+      saveStoredRecords(filtered);
+      showNotification(`Removed record for ${target.name}`, 'warning');
+    }
+
+    function resetForm() {
+      document.getElementById('addVoyagerForm').reset();
+      currentEditingId = null;
+    }
+
+    function openInviteDrawer(id) {
+      const records = getStoredRecords();
+      const target = records.find(r => r.id === id);
+      if (!target) return;
+
+      document.getElementById('drawerRecipientName').innerText = target.name;
+      document.getElementById('drawerRecipientEmail').innerText = target.email;
+      document.getElementById('drawerAvatar').innerText = target.name.substring(0, 2).toUpperCase();
+
+      const encodedName = encodeURIComponent(target.name);
+      document.getElementById('drawerShareLink').value = `${window.location.origin}${window.location.pathname}?name=${encodedName}`;
+
+      document.getElementById('drawerLetterPreview').innerHTML = `
+        <p>Dear <strong>${target.name}</strong>,</p>
+        <p>Cultural Voyagers warmly wishes you a spectacular Birthday! To celebrate your voyage with us, please accept a complimentary PKR 5,000 credit towards your next curated travel experience.</p>
+        <p class="font-serif italic text-amber-400">Warmest regards,<br>The Cultural Voyagers Executive Team</p>
+      `;
+
+      const overlay = document.getElementById('drawerOverlay');
+      const container = document.getElementById('drawerContainer');
+
+      overlay.classList.remove('hidden');
+      setTimeout(() => {
+        overlay.classList.remove('opacity-0');
+        container.classList.remove('translate-x-full');
+      }, 10);
+    }
+
+    function closeDrawer() {
+      const overlay = document.getElementById('drawerOverlay');
+      const container = document.getElementById('drawerContainer');
+
+      container.classList.add('translate-x-full');
+      overlay.classList.add('opacity-0');
+      setTimeout(() => {
+        overlay.classList.add('hidden');
+      }, 300);
+    }
+
+    function copyVoucherQuick(name) {
+      const textToCopy = `Cultural Voyagers Birthday Voucher for ${name}: VOYAGER2026 (PKR 5,000 Credit)`;
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        showNotification(`Copied PKR 5,000 Voucher Code for ${name}!`, 'success');
+      }).catch(() => {
+        // Fallback for older browsers
+        const tempInput = document.createElement('input');
+        tempInput.value = textToCopy;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand('copy');
+        document.body.removeChild(tempInput);
+        showNotification(`Copied Voucher Code!`, 'success');
+      });
+    }
+
+    function copyToClipboard(elementId, successMsg) {
+      const el = document.getElementById(elementId);
+      const text = el.value || el.innerText;
+      
+      navigator.clipboard.writeText(text).then(() => {
+        showNotification(successMsg, 'success');
+      }).catch(() => {
+        showNotification(successMsg, 'success');
+      });
+    }
+
+    function setFilterCategory(cat) {
+      currentCategoryFilter = cat;
+      document.querySelectorAll('.filter-tab').forEach(btn => {
+        btn.classList.remove('bg-amber-500', 'text-slate-950', 'font-semibold');
+        btn.classList.add('text-slate-400');
+      });
+
+      const activeBtn = document.getElementById(`filterBtn${cat}`);
+      if (activeBtn) {
+        activeBtn.classList.add('bg-amber-500', 'text-slate-950', 'font-semibold');
+        activeBtn.classList.remove('text-slate-400');
+      }
+
+      renderApp();
+    }
+
+    function filterRecords() {
+      renderApp();
+    }
+
+    function formatDateDisplay(dobString) {
+      if (!dobString) return 'N/A';
+      const parts = dobString.split('-');
+      if (parts.length !== 3) return dobString;
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const monthIdx = parseInt(parts[1], 10) - 1;
+      return `${parts[2]} ${months[monthIdx]} ${parts[0]}`;
+    }
+
+    function triggerConfetti() {
+      if (typeof confetti === 'function') {
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 },
+          colors: ['#f59e0b', '#f97316', '#38bdf8']
+        });
+      }
+    }
+
+    function triggerLogoAnimation() {
+      triggerConfetti();
+      showNotification('Cultural Voyagers — Elevating Luxury Travel', 'info');
+    }
+
+    function scrollToForm() {
+      document.getElementById('addFormSection').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function showNotification(msg, type = 'info') {
+      const toast = document.getElementById('toastNotification');
+      const msgEl = document.getElementById('toastMessage');
+      const iconEl = document.getElementById('toastIcon');
+
+      msgEl.innerText = msg;
+      
+      if (type === 'success') {
+        iconEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>`;
+      } else if (type === 'warning') {
+        iconEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-amber-400 text-lg"></i>`;
+      } else {
+        iconEl.innerHTML = `<i class="fa-solid fa-circle-info text-sky-400 text-lg"></i>`;
+      }
+
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 3000);
+    }
+
+    // App Initialization on Load
+    window.onload = function() {
+      renderApp();
+      // Auto trigger confetti if there are birthdays today
+      const records = getStoredRecords();
+      const hasToday = records.some(r => calculateDaysLeft(r.dob) === 0);
+      if (hasToday) {
+        setTimeout(triggerConfetti, 800);
+      }
+    };
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,316 @@
+:root {
+  --bg-dark: #080c16;
+  --bg-card: rgba(255, 255, 255, 0.04);
+  --accent-gold: #e2b15e;
+  --accent-gold-bright: #ffd700;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --font-serif: 'Cinzel', serif;
+  --font-sans: 'Plus Jakarta Sans', sans-serif;
+  --transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+  position: relative;
+  min-height: 100vh;
+}
+
+#starsCanvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.screen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+  padding: 3rem 1.5rem;
+  text-align: center;
+}
+
+.hidden {
+  display: none !important;
+  opacity: 0;
+  transform: translateY(40px);
+}
+
+/* Brandmark Badge */
+.brandmark-badge {
+  display: inline-block;
+  font-family: var(--font-serif);
+  font-size: 0.9rem;
+  letter-spacing: 0.4em;
+  color: var(--accent-gold);
+  padding: 8px 24px;
+  border: 1px solid rgba(226, 177, 94, 0.3);
+  border-radius: 50px;
+  background: rgba(226, 177, 94, 0.05);
+  margin-bottom: 2rem;
+  backdrop-filter: blur(8px);
+}
+
+/* Envelope / Main Card (Large & Filled) */
+.opening-content {
+  max-width: 720px;
+  width: 100%;
+}
+
+.envelope-card {
+  position: relative;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+  border: 1.5px solid rgba(226, 177, 94, 0.35);
+  backdrop-filter: blur(16px);
+  padding: 4.5rem 3rem;
+  border-radius: 28px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+/* Floating Animations for icons */
+.floating-icons .f-icon {
+  position: absolute;
+  font-size: 1.8rem;
+  opacity: 0.7;
+  animation: float 5s ease-in-out infinite;
+}
+
+.star1 { top: 15%; left: 8%; animation-delay: 0s; }
+.plane1 { top: 18%; right: 10%; animation-delay: 1.5s; }
+.balloon1 { bottom: 18%; left: 10%; animation-delay: 2.5s; }
+.star2 { bottom: 15%; right: 8%; animation-delay: 3.5s; }
+
+.tagline {
+  color: var(--accent-gold);
+  font-size: 0.95rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.invitation-title {
+  font-family: var(--font-serif);
+  font-size: 3rem;
+  font-weight: 700;
+  line-height: 1.25;
+  margin-bottom: 1.2rem;
+  background: linear-gradient(135deg, #ffffff, var(--accent-gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.sub-text {
+  font-size: 1.15rem;
+  color: var(--text-muted);
+  margin-bottom: 2.5rem;
+  font-weight: 300;
+}
+
+/* Big Interactive Button */
+.reveal-btn {
+  background: linear-gradient(135deg, var(--accent-gold), #c4953c);
+  color: #0b0f19;
+  border: none;
+  padding: 1.2rem 3rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  border-radius: 50px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  transition: var(--transition);
+  box-shadow: 0 12px 30px rgba(226, 177, 94, 0.35);
+}
+
+.reveal-btn:hover {
+  transform: translateY(-4px) scale(1.04);
+  box-shadow: 0 20px 45px rgba(226, 177, 94, 0.55);
+}
+
+/* Section 2: Celebration Reveal */
+.reveal-container {
+  max-width: 800px;
+  width: 100%;
+}
+
+.badge-pill {
+  display: inline-block;
+  padding: 8px 22px;
+  border-radius: 30px;
+  background: rgba(226, 177, 94, 0.15);
+  color: var(--accent-gold);
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  margin-bottom: 2rem;
+  border: 1px solid rgba(226, 177, 94, 0.3);
+}
+
+.birthday-headline {
+  font-family: var(--font-serif);
+  font-size: 3.8rem;
+  line-height: 1.15;
+  margin-bottom: 1.8rem;
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #ffffff 20%, var(--accent-gold-bright) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.reveal-message {
+  font-size: 1.3rem;
+  color: var(--text-muted);
+  line-height: 1.8;
+  margin-bottom: 3rem;
+}
+
+/* Gift Voucher Card */
+.gift-card {
+  background: linear-gradient(135deg, rgba(226, 177, 94, 0.12), rgba(255, 255, 255, 0.03));
+  border: 1px dashed var(--accent-gold);
+  border-radius: 20px;
+  padding: 2rem;
+  margin-top: 1rem;
+  text-align: left;
+}
+
+.gift-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.gift-tag {
+  background: var(--accent-gold);
+  color: #000;
+  font-weight: 700;
+  font-size: 0.75rem;
+  padding: 4px 12px;
+  border-radius: 4px;
+  letter-spacing: 0.1em;
+}
+
+.gift-code {
+  font-family: monospace;
+  color: var(--accent-gold);
+  font-size: 1rem;
+  letter-spacing: 0.15em;
+}
+
+.gift-body h3 {
+  font-family: var(--font-serif);
+  font-size: 1.4rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-main);
+}
+
+.gift-body p {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* Destinations Section */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  max-width: 1100px;
+  width: 100%;
+  margin: 3rem 0;
+}
+
+.dest-card {
+  background: var(--bg-card);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  overflow: hidden;
+  transition: var(--transition);
+  text-align: left;
+}
+
+.dest-card:hover {
+  transform: translateY(-8px);
+  border-color: var(--accent-gold);
+}
+
+.dest-img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+}
+
+.dest-info {
+  padding: 1.8rem;
+}
+
+.dest-info h3 {
+  font-family: var(--font-serif);
+  font-size: 1.4rem;
+  color: var(--accent-gold);
+  margin-bottom: 0.5rem;
+}
+
+.dest-info p {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.cta-btn {
+  display: inline-block;
+  background: transparent;
+  border: 2px solid var(--accent-gold);
+  color: var(--accent-gold);
+  padding: 1.1rem 3rem;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 1.05rem;
+  transition: var(--transition);
+}
+
+.cta-btn:hover {
+  background: var(--accent-gold);
+  color: #000;
+}
+
+footer {
+  padding: 3rem 1.5rem;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-12px) rotate(4deg); }
+}
+
+@media (max-width: 768px) {
+  .invitation-title { font-size: 2.2rem; }
+  .birthday-headline { font-size: 2.6rem; }
+  .envelope-card { padding: 3rem 1.5rem; }
+}
