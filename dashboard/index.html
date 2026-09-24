@@ -45,7 +45,6 @@
   </script>
 
   <style>
-    /* Custom scrollbar and glassmorphism touches */
     ::-webkit-scrollbar {
       width: 8px;
       height: 8px;
@@ -102,16 +101,20 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-20">
         
-        <!-- Brand Logo & Title -->
         <div class="flex items-center space-x-4">
           <div class="relative group cursor-pointer" onclick="triggerLogoAnimation()">
             <div class="absolute -inset-1 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full blur opacity-60 group-hover:opacity-100 transition duration-500"></div>
-            <img 
-              src="logo.png" 
-              alt="Cultural Voyagers Logo" 
-              class="relative w-14 h-14 rounded-full object-cover border-2 border-amber-400/80 shadow-glow-logo floating-logo bg-slate-900"
-              onerror="this.onerror=null; this.src='https://placehold.co/100x100/1e293b/f59e0b?text=CV';"
-            >
+            
+            <div class="relative w-14 h-14 rounded-full overflow-hidden border-2 border-amber-400/80 shadow-glow-logo floating-logo bg-slate-900 flex items-center justify-center shrink-0">
+              <img 
+                id="brandLogo"
+                src="logo.png" 
+                alt="Cultural Voyagers Logo" 
+                class="w-full h-full object-cover"
+                onerror="this.style.display='none'; document.getElementById('logoFallback').classList.remove('hidden');"
+              >
+              <span id="logoFallback" class="hidden font-serif font-bold text-amber-400 text-base tracking-wider">CV</span>
+            </div>
           </div>
           <div>
             <div class="flex items-center space-x-2">
@@ -128,13 +131,12 @@
           </div>
         </div>
 
-        <!-- Quick Stats Banner / Action Button -->
         <div class="flex items-center space-x-3">
           <button 
             onclick="scrollToForm()"
-            class="hidden sm:inline-flex items-center px-4 py-2 rounded-xl text-sm font-semibold text-slate-900 bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-300 hover:to-orange-300 shadow-glow-gold hover:scale-105 transition duration-200"
+            class="hidden sm:inline-flex items-center px-4 py-2 rounded-xl text-sm font-semibold text-slate-950 bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-300 hover:to-orange-300 shadow-glow-gold hover:scale-105 transition duration-200"
           >
-            <i class="fa-solid font-bold fa-plus mr-2"></i> Add Voyager
+            <i class="fa-solid fa-plus mr-2 font-bold"></i> Add Voyager
           </button>
           
           <button 
@@ -144,6 +146,7 @@
           >
             <i class="fa-solid fa-arrows-rotate text-sm"></i>
           </button>
+            <script src="https://cdn.tailwindcss.com"></script>
         </div>
 
       </div>
@@ -155,7 +158,6 @@
 
     <!-- KPI Overview Section -->
     <section class="grid grid-cols-1 sm:grid-cols-3 gap-5">
-      <!-- Total Ledger Card -->
       <div class="glass-card rounded-2xl p-6 relative overflow-hidden group hover:border-slate-700 transition">
         <div class="absolute -right-4 -bottom-4 opacity-10 group-hover:opacity-20 transition duration-300">
           <i class="fa-solid fa-users text-8xl text-slate-100"></i>
@@ -171,7 +173,6 @@
         </div>
       </div>
 
-      <!-- Celebrating Today Card -->
       <div class="glass-card rounded-2xl p-6 relative overflow-hidden group border border-amber-500/30 hover:border-amber-500/60 transition shadow-glow-gold">
         <div class="absolute -right-4 -bottom-4 opacity-10 group-hover:opacity-25 transition duration-300">
           <i class="fa-solid fa-cake-candles text-8xl text-amber-400"></i>
@@ -192,7 +193,6 @@
         </div>
       </div>
 
-      <!-- Upcoming (7 Days) Card -->
       <div class="glass-card rounded-2xl p-6 relative overflow-hidden group hover:border-slate-700 transition">
         <div class="absolute -right-4 -bottom-4 opacity-10 group-hover:opacity-20 transition duration-300">
           <i class="fa-solid fa-calendar-week text-8xl text-sky-400"></i>
@@ -223,30 +223,28 @@
         </span>
       </div>
 
-      <!-- Grid for Passport Stamp Cards -->
-      <div id="todaySpotlightGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <!-- Rendered dynamically via JS -->
-      </div>
+      <div id="todaySpotlightGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
     </section>
 
     <!-- Records Directory Header & Filter Toolbar -->
     <section class="glass-card rounded-2xl p-6 space-y-6">
       
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-5">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-800 pb-5">
         <div>
           <h2 class="font-serif text-xl font-bold text-white">Voyager Records Ledger</h2>
           <p class="text-xs text-slate-400 mt-0.5">Filter, search, and generate client birthday vouchers & invites.</p>
         </div>
 
-        <!-- Search input & Category Tabs -->
-        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-          <div class="relative min-w-[240px]">
+        <!-- Toolbar Buttons: Search, Filters, Excel Export & CSV Import -->
+        <div class="flex flex-wrap items-center gap-3">
+          
+          <div class="relative min-w-[220px]">
             <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
             <input 
               type="text" 
               id="searchInput"
               oninput="filterRecords()"
-              placeholder="Search name, email..." 
+              placeholder="Search name, email, category..." 
               class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl pl-9 pr-4 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500 transition"
             >
           </div>
@@ -262,17 +260,31 @@
             <button onclick="setFilterCategory('UPCOMING')" id="filterBtnUPCOMING" class="filter-tab px-3 py-1.5 rounded-lg font-medium transition text-slate-400 hover:text-white">
               Upcoming
             </button>
-            <button onclick="setFilterCategory('Client')" id="filterBtnClient" class="filter-tab px-3 py-1.5 rounded-lg font-medium transition text-slate-400 hover:text-white">
-              Clients
-            </button>
-            <button onclick="setFilterCategory('Staff')" id="filterBtnStaff" class="filter-tab px-3 py-1.5 rounded-lg font-medium transition text-slate-400 hover:text-white">
-              Staff
-            </button>
           </div>
+
+          <!-- IMPORT & EXCEL EXPORT BUTTONS -->
+          <div class="flex items-center space-x-2">
+            <button 
+              onclick="exportToExcel()"
+              class="px-3.5 py-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/40 text-xs font-semibold flex items-center transition shadow-sm"
+              title="Export records to Microsoft Excel / CSV"
+            >
+              <i class="fa-solid fa-file-excel mr-1.5 text-emerald-400"></i> Export to Excel
+            </button>
+
+            <label 
+              class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/80 text-xs font-semibold flex items-center cursor-pointer transition"
+              title="Import CSV File"
+            >
+              <i class="fa-solid fa-file-import mr-1.5 text-sky-400"></i> Import CSV
+              <input type="file" id="csvFileInput" accept=".csv" onchange="importCSV(event)" class="hidden">
+            </label>
+          </div>
+
         </div>
       </div>
 
-      <!-- Main Data Table -->
+      <!-- Data Table -->
       <div class="overflow-x-auto">
         <table class="w-full text-left text-sm text-slate-300">
           <thead class="bg-slate-900/80 text-xs uppercase tracking-wider text-slate-400 border-b border-slate-800">
@@ -286,7 +298,6 @@
             </tr>
           </thead>
           <tbody id="recordsTableBody" class="divide-y divide-slate-800/60 font-sans">
-            <!-- Dynamic table rows generated via JavaScript -->
           </tbody>
         </table>
 
@@ -302,11 +313,11 @@
 
     </section>
 
-    <!-- Form Section: Log New Voyager -->
+    <!-- Form Section -->
     <section id="addFormSection" class="glass-card rounded-2xl p-6 space-y-6">
       <div class="border-b border-slate-800 pb-4 flex items-center justify-between">
         <div>
-          <h2 class="font-serif text-xl font-bold text-white">Add New Voyager Record</h2>
+          <h2 id="formTitle" class="font-serif text-xl font-bold text-white">Add New Voyager Record</h2>
           <p class="text-xs text-slate-400 mt-0.5">Register a new client, staff, or partner into the Cultural Voyagers birthday system.</p>
         </div>
         <span class="text-xs text-slate-500 bg-slate-800 px-2.5 py-1 rounded-lg">
@@ -315,8 +326,6 @@
       </div>
 
       <form id="addVoyagerForm" onsubmit="handleFormSubmit(event)" class="grid grid-cols-1 md:grid-cols-2 gap-5">
-        
-        <!-- Full Name -->
         <div class="space-y-1.5">
           <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wide" for="inputName">
             Full Name <span class="text-amber-400">*</span>
@@ -333,7 +342,6 @@
           </div>
         </div>
 
-        <!-- Email Address -->
         <div class="space-y-1.5">
           <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wide" for="inputEmail">
             Email Address <span class="text-amber-400">*</span>
@@ -350,7 +358,6 @@
           </div>
         </div>
 
-        <!-- Date of Birth -->
         <div class="space-y-1.5">
           <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wide" for="inputDob">
             Date of Birth <span class="text-amber-400">*</span>
@@ -365,7 +372,6 @@
           </div>
         </div>
 
-        <!-- Category -->
         <div class="space-y-1.5">
           <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wide" for="inputCategory">
             Category / Relation <span class="text-amber-400">*</span>
@@ -376,15 +382,14 @@
               required
               class="w-full bg-slate-900 border border-slate-700/80 rounded-xl px-4 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-amber-500 transition"
             >
-              <option value="Client">VIP Client</option>
-              <option value="Staff">Team / Staff</option>
-              <option value="Partner">Travel Partner</option>
-              <option value="Family">Family & Friend</option>
+              <option value="VIP Client">VIP Client</option>
+              <option value="Staff">Staff</option>
+              <option value="Travel Partner">Travel Partner</option>
+              <option value="Family">Family</option>
             </select>
           </div>
         </div>
 
-        <!-- Submit & Reset Buttons -->
         <div class="md:col-span-2 flex items-center justify-end space-x-3 pt-2">
           <button 
             type="button" 
@@ -396,6 +401,7 @@
           
           <button 
             type="submit" 
+            id="submitBtn"
             class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-300 hover:to-orange-300 text-slate-950 font-semibold text-xs shadow-glow-gold hover:scale-105 transition duration-200"
           >
             <i class="fa-solid fa-floppy-disk mr-1.5"></i> Save Record
@@ -407,7 +413,7 @@
 
   </main>
 
-  <!-- Slide-out Modal Drawer for Personalized Invites & Vouchers -->
+  <!-- Slide-out Drawer -->
   <div id="drawerOverlay" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden transition-opacity duration-300" onclick="closeDrawer()">
     <div 
       id="drawerContainer" 
@@ -415,14 +421,13 @@
       onclick="event.stopPropagation()"
     >
       <div>
-        <!-- Drawer Header -->
         <div class="flex items-center justify-between pb-4 border-b border-slate-800">
           <div class="flex items-center space-x-3">
             <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
               <i class="fa-solid fa-paper-plane text-lg"></i>
             </div>
             <div>
-              <h3 class="font-serif font-bold text-lg text-white">GENERATE INVITE</h3>
+              <h3 class="font-serif font-bold text-lg text-white">GENERATE WISH </h3>
               <p class="text-xs text-slate-400">Cultural Voyagers Birthday Voucher</p>
             </div>
           </div>
@@ -431,9 +436,7 @@
           </button>
         </div>
 
-        <!-- Drawer Body Content -->
         <div class="mt-6 space-y-5">
-          <!-- Recipient Badge -->
           <div class="bg-slate-900/90 rounded-xl p-3.5 border border-slate-800 flex items-center space-x-3">
             <div id="drawerAvatar" class="w-10 h-10 rounded-full bg-gradient-to-tr from-amber-500 to-orange-400 text-slate-950 font-bold flex items-center justify-center text-sm">
               CV
@@ -444,15 +447,12 @@
             </div>
           </div>
 
-          <!-- Personalized Invitation Letter Template -->
           <div class="space-y-1.5">
             <label class="text-xs font-semibold text-slate-300 uppercase tracking-wide">Invitation Template</label>
             <div id="drawerLetterPreview" class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 text-xs text-slate-300 space-y-2 leading-relaxed font-sans">
-              <!-- Rendered via JS -->
             </div>
           </div>
 
-          <!-- Shareable Dynamic Link -->
           <div class="space-y-1.5">
             <label class="text-xs font-semibold text-slate-300 uppercase tracking-wide">Shareable Link</label>
             <div class="flex items-center space-x-2">
@@ -471,7 +471,6 @@
             </div>
           </div>
 
-          <!-- Voucher Code Box -->
           <div class="space-y-1.5">
             <label class="text-xs font-semibold text-slate-300 uppercase tracking-wide">Exclusive Birthday Voucher</label>
             <div class="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/30 rounded-xl p-4 text-center space-y-2">
@@ -485,7 +484,6 @@
         </div>
       </div>
 
-      <!-- Drawer Footer Actions -->
       <div class="pt-6 border-t border-slate-800 space-y-2">
         <button 
           onclick="copyToClipboard('drawerVoucherCode', 'PKR 5,000 Voucher Code Copied!')"
@@ -503,7 +501,7 @@
     </div>
   </div>
 
-  <!-- Notification Toast Message Box -->
+  <!-- Notification Toast -->
   <div id="toastNotification" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
     <div class="bg-slate-900 border border-amber-500/50 text-slate-100 px-4 py-3 rounded-xl shadow-2xl flex items-center space-x-3">
       <div id="toastIcon" class="text-amber-400"><i class="fa-solid fa-circle-check"></i></div>
@@ -512,7 +510,6 @@
   </div>
 
   <script>
-    // Initial Default Seed Data
     const INITIAL_VOYAGERS = [
       { id: '1', name: 'Sanober K.', email: 'sanoberk@gmail.com', dob: getTodayFormatted(0), category: 'VIP Client' },
       { id: '2', name: 'Omar R.', email: 'omarr@gmail.com', dob: getTodayFormatted(0), category: 'VIP Client' },
@@ -524,7 +521,6 @@
     let currentCategoryFilter = 'ALL';
     let currentEditingId = null;
 
-    // Utility: Format date for offsets relative to today
     function getTodayFormatted(offsetDays = 0) {
       const today = new Date();
       today.setDate(today.getDate() + offsetDays);
@@ -534,7 +530,12 @@
       return `${yyyy}-${mm}-${dd}`;
     }
 
-    // Initialize State from LocalStorage
+    function formatDateDisplay(dobString) {
+      if (!dobString) return '';
+      const date = new Date(dobString);
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
+
     function getStoredRecords() {
       const stored = localStorage.getItem('cultural_voyagers_ledger');
       if (!stored) {
@@ -553,7 +554,6 @@
       renderApp();
     }
 
-    // Calculate days remaining until next birthday
     function calculateDaysLeft(dobString) {
       if (!dobString) return 999;
       const today = new Date();
@@ -573,11 +573,82 @@
       return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     }
 
-    // Render Entire Application View
+    function exportToExcel() {
+      const records = getStoredRecords();
+      if (records.length === 0) {
+        showNotification('No records available to export', 'info');
+        return;
+      }
+
+      let csvContent = "data:text/csv;charset=utf-8,";
+      csvContent += "ID,Full Name,Email Address,Date of Birth,Category,Days Until Birthday\n";
+
+      records.forEach(r => {
+        const daysLeft = calculateDaysLeft(r.dob);
+        const nameEscaped = `"${r.name.replace(/"/g, '""')}"`;
+        const emailEscaped = `"${r.email.replace(/"/g, '""')}"`;
+        const categoryEscaped = `"${r.category.replace(/"/g, '""')}"`;
+        
+        csvContent += `${r.id},${nameEscaped},${emailEscaped},${r.dob},${categoryEscaped},${daysLeft}\n`;
+      });
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      
+      const filename = `Cultural_Voyagers_Birthdays_${getTodayFormatted(0)}.csv`;
+      link.setAttribute("download", filename);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      showNotification('Excel sheet downloaded successfully!', 'success');
+    }
+
+    function importCSV(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const text = e.target.result;
+        const lines = text.split('\n');
+        let addedCount = 0;
+        let records = getStoredRecords();
+
+        for (let i = 1; i < lines.length; i++) {
+          const line = lines[i].trim();
+          if (!line) continue;
+          
+          const cols = line.split(',').map(c => c.replace(/^"|"$/g, '').trim());
+          if (cols.length >= 4) {
+            const name = cols[1] || cols[0];
+            const email = cols[2] || cols[1];
+            const dob = cols[3] || cols[2];
+            const category = cols[4] || 'VIP Client';
+
+            if (name && dob) {
+              records.push({
+                id: Date.now().toString() + Math.random().toString(36).substr(2, 4),
+                name,
+                email,
+                dob,
+                category
+              });
+              addedCount++;
+            }
+          }
+        }
+
+        saveStoredRecords(records);
+        showNotification(`Imported ${addedCount} records from CSV file!`, 'success');
+        event.target.value = '';
+      };
+      reader.readAsText(file);
+    }
+
     function renderApp() {
       const records = getStoredRecords();
-
-      // Sort records by nearest birthday
       records.sort((a, b) => calculateDaysLeft(a.dob) - calculateDaysLeft(b.dob));
 
       renderKPIs(records);
@@ -598,7 +669,6 @@
       document.getElementById('kpiUpcomingCount').innerText = upcomingCount;
     }
 
-    // Render Today's Spotlight Cards (Passport Stamp Format)
     function renderTodaySpotlight(records) {
       const container = document.getElementById('todaySpotlightGrid');
       const todayRecords = records.filter(r => calculateDaysLeft(r.dob) === 0);
@@ -654,21 +724,20 @@
       const emptyState = document.getElementById('emptyState');
       const searchVal = document.getElementById('searchInput').value.toLowerCase().trim();
 
-      const filtered = records.filter(r => {
-        const matchesSearch = r.name.toLowerCase().includes(searchVal) || r.email.toLowerCase().includes(searchVal);
+      let filtered = records.filter(r => {
+        // UPDATED SEARCH LOGIC: Includes category in search
+        const matchesSearch = 
+          r.name.toLowerCase().includes(searchVal) || 
+          r.email.toLowerCase().includes(searchVal) || 
+          (r.category && r.category.toLowerCase().includes(searchVal));
         
         const daysLeft = calculateDaysLeft(r.dob);
-        let matchesCategory = true;
 
-        if (currentCategoryFilter === 'TODAY') {
-          matchesCategory = daysLeft === 0;
-        } else if (currentCategoryFilter === 'UPCOMING') {
-          matchesCategory = daysLeft > 0 && daysLeft <= 7;
-        } else if (currentCategoryFilter !== 'ALL') {
-          matchesCategory = r.category.toLowerCase() === currentCategoryFilter.toLowerCase();
-        }
+        if (!matchesSearch) return false;
 
-        return matchesSearch && matchesCategory;
+        if (currentCategoryFilter === 'TODAY') return daysLeft === 0;
+        if (currentCategoryFilter === 'UPCOMING') return daysLeft > 0 && daysLeft <= 7;
+        return true;
       });
 
       if (filtered.length === 0) {
@@ -681,60 +750,54 @@
 
       tbody.innerHTML = filtered.map(r => {
         const daysLeft = calculateDaysLeft(r.dob);
-        let statusBadge = '';
-
+        
+        let daysBadge = '';
         if (daysLeft === 0) {
-          statusBadge = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-extrabold bg-amber-500 text-slate-950 animate-pulse"><i class="fa-solid fa-cake-candles mr-1"></i> Today!</span>`;
+          daysBadge = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-amber-400 text-slate-950 animate-pulse shadow-glow-gold"><i class="fa-solid fa-cake-candles mr-1"></i> Today!</span>`;
         } else if (daysLeft <= 7) {
-          statusBadge = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-sky-500/20 text-sky-300 border border-sky-500/30">${daysLeft} days left</span>`;
+          daysBadge = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-sky-500/20 text-sky-300 border border-sky-500/30">${daysLeft} days</span>`;
         } else {
-          statusBadge = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-normal text-slate-400 bg-slate-800/80">${daysLeft} days</span>`;
+          daysBadge = `<span class="text-xs text-slate-400 font-mono">${daysLeft} days</span>`;
         }
 
         return `
-          <tr class="hover:bg-slate-800/40 transition">
-            <td class="py-3.5 px-4 font-semibold text-slate-100 flex items-center space-x-3">
+          <tr class="hover:bg-slate-800/40 transition group">
+            <td class="py-3.5 px-4 font-semibold text-white flex items-center space-x-3">
               <div class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xs text-amber-400 font-bold">
-                ${r.name.charAt(0)}
+                ${r.name.substring(0, 2).toUpperCase()}
               </div>
               <span>${r.name}</span>
             </td>
-            <td class="py-3.5 px-4 text-xs text-slate-400 font-mono">${r.email}</td>
-            <td class="py-3.5 px-4 text-xs">
-              <span class="px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 border border-slate-700/60 font-medium">
+            <td class="py-3.5 px-4 text-slate-400 text-xs">${r.email}</td>
+            <td class="py-3.5 px-4">
+              <span class="px-2 py-0.5 rounded text-[11px] font-medium bg-slate-800 text-slate-300 border border-slate-700">
                 ${r.category}
               </span>
             </td>
-            <td class="py-3.5 px-4 text-xs text-slate-300">${formatDateDisplay(r.dob)}</td>
-            <td class="py-3.5 px-4 text-xs">${statusBadge}</td>
-            <td class="py-3.5 px-4 text-xs text-right space-x-1.5">
+            <td class="py-3.5 px-4 text-xs font-mono text-slate-300">${formatDateDisplay(r.dob)}</td>
+            <td class="py-3.5 px-4">${daysBadge}</td>
+            <td class="py-3.5 px-4 text-right space-x-1.5">
               <button 
-                onclick="openInviteDrawer('${r.id}')" 
-                class="px-2.5 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold transition"
-                title="Generate Personal Link & Voucher"
+                onclick="openInviteDrawer('${r.id}')"
+                class="px-2.5 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs font-semibold transition"
+                title="Generate Wish Letter & Voucher"
               >
-                GENERATE INVITE
+                <i class="fa-solid fa-paper-plane mr-1"></i> SEND WISH
+            
               </button>
               <button 
-                onclick="copyVoucherQuick('${r.name}')" 
-                class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 font-medium transition"
-                title="Copy PKR 5,000 Voucher"
-              >
-                COPY VOUCHER
-              </button>
-              <button 
-                onclick="editRecord('${r.id}')" 
-                class="p-1.5 rounded-lg text-slate-400 hover:text-amber-400 hover:bg-slate-800 transition"
+                onclick="editRecord('${r.id}')"
+                class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition"
                 title="Edit Record"
               >
-                <i class="fa-solid fa-pen"></i>
+                <i class="fa-solid fa-pen text-xs"></i>
               </button>
               <button 
-                onclick="deleteRecord('${r.id}')" 
-                class="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition"
+                onclick="deleteRecord('${r.id}')"
+                class="p-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 transition"
                 title="Delete Record"
               >
-                <i class="fa-solid fa-trash-can"></i>
+                <i class="fa-solid fa-trash text-xs"></i>
               </button>
             </td>
           </tr>
@@ -742,10 +805,26 @@
       }).join('');
     }
 
-    // Form Handling & LocalStorage Mutations
+    function filterRecords() {
+      renderApp();
+    }
+
+    function setFilterCategory(cat) {
+      currentCategoryFilter = cat;
+      document.querySelectorAll('.filter-tab').forEach(btn => {
+        btn.classList.remove('bg-amber-500', 'text-slate-950', 'font-semibold');
+        btn.classList.add('text-slate-400');
+      });
+      const activeBtn = document.getElementById(`filterBtn${cat}`);
+      if (activeBtn) {
+        activeBtn.classList.add('bg-amber-500', 'text-slate-950', 'font-semibold');
+        activeBtn.classList.remove('text-slate-400');
+      }
+      renderApp();
+    }
+
     function handleFormSubmit(event) {
       event.preventDefault();
-
       const name = document.getElementById('inputName').value.trim();
       const email = document.getElementById('inputEmail').value.trim();
       const dob = document.getElementById('inputDob').value;
@@ -754,9 +833,8 @@
       let records = getStoredRecords();
 
       if (currentEditingId) {
-        records = records.map(r => r.id === currentEditingId ? { id: currentEditingId, name, email, dob, category } : r);
-        showNotification(`Updated voyager record for ${name}`, 'success');
-        currentEditingId = null;
+        records = records.map(r => r.id === currentEditingId ? { id: r.id, name, email, dob, category } : r);
+        showNotification('Voyager record updated successfully!', 'success');
       } else {
         const newRecord = {
           id: Date.now().toString(),
@@ -766,7 +844,7 @@
           category
         };
         records.push(newRecord);
-        showNotification(`Added ${name} to Birthday Ledger`, 'success');
+        showNotification('New Voyager registered to ledger!', 'success');
       }
 
       saveStoredRecords(records);
@@ -775,181 +853,127 @@
 
     function editRecord(id) {
       const records = getStoredRecords();
-      const target = records.find(r => r.id === id);
-      if (!target) return;
-
-      document.getElementById('inputName').value = target.name;
-      document.getElementById('inputEmail').value = target.email;
-      document.getElementById('inputDob').value = target.dob;
-      document.getElementById('inputCategory').value = target.category;
+      const r = records.find(item => item.id === id);
+      if (!r) return;
 
       currentEditingId = id;
+      document.getElementById('inputName').value = r.name;
+      document.getElementById('inputEmail').value = r.email;
+      document.getElementById('inputDob').value = r.dob;
+      document.getElementById('inputCategory').value = r.category;
+
+      document.getElementById('formTitle').innerText = 'Edit Voyager Record';
+      document.getElementById('submitBtn').innerHTML = `<i class="fa-solid fa-check mr-1.5"></i> Update Record`;
+
       scrollToForm();
-      showNotification(`Editing record for ${target.name}`, 'info');
     }
 
     function deleteRecord(id) {
-      const records = getStoredRecords();
-      const target = records.find(r => r.id === id);
-      if (!target) return;
-
-      const filtered = records.filter(r => r.id !== id);
-      saveStoredRecords(filtered);
-      showNotification(`Removed record for ${target.name}`, 'warning');
+      if (confirm('Are you sure you want to remove this record from the ledger?')) {
+        let records = getStoredRecords();
+        records = records.filter(r => r.id !== id);
+        saveStoredRecords(records);
+        showNotification('Record removed from ledger', 'info');
+      }
     }
 
     function resetForm() {
-      document.getElementById('addVoyagerForm').reset();
       currentEditingId = null;
-    }
-
-    function openInviteDrawer(id) {
-      const records = getStoredRecords();
-      const target = records.find(r => r.id === id);
-      if (!target) return;
-
-      document.getElementById('drawerRecipientName').innerText = target.name;
-      document.getElementById('drawerRecipientEmail').innerText = target.email;
-      document.getElementById('drawerAvatar').innerText = target.name.substring(0, 2).toUpperCase();
-
-      const encodedName = encodeURIComponent(target.name);
-      document.getElementById('drawerShareLink').value = `${window.location.origin}${window.location.pathname}?name=${encodedName}`;
-
-      document.getElementById('drawerLetterPreview').innerHTML = `
-        <p>Dear <strong>${target.name}</strong>,</p>
-        <p>Cultural Voyagers warmly wishes you a spectacular Birthday! To celebrate your voyage with us, please accept a complimentary PKR 5,000 credit towards your next curated travel experience.</p>
-        <p class="font-serif italic text-amber-400">Warmest regards,<br>The Cultural Voyagers Executive Team</p>
-      `;
-
-      const overlay = document.getElementById('drawerOverlay');
-      const container = document.getElementById('drawerContainer');
-
-      overlay.classList.remove('hidden');
-      setTimeout(() => {
-        overlay.classList.remove('opacity-0');
-        container.classList.remove('translate-x-full');
-      }, 10);
-    }
-
-    function closeDrawer() {
-      const overlay = document.getElementById('drawerOverlay');
-      const container = document.getElementById('drawerContainer');
-
-      container.classList.add('translate-x-full');
-      overlay.classList.add('opacity-0');
-      setTimeout(() => {
-        overlay.classList.add('hidden');
-      }, 300);
-    }
-
-    function copyVoucherQuick(name) {
-      const textToCopy = `Cultural Voyagers Birthday Voucher for ${name}: VOYAGER2026 (PKR 5,000 Credit)`;
-      navigator.clipboard.writeText(textToCopy).then(() => {
-        showNotification(`Copied PKR 5,000 Voucher Code for ${name}!`, 'success');
-      }).catch(() => {
-        // Fallback for older browsers
-        const tempInput = document.createElement('input');
-        tempInput.value = textToCopy;
-        document.body.appendChild(tempInput);
-        tempInput.select();
-        document.execCommand('copy');
-        document.body.removeChild(tempInput);
-        showNotification(`Copied Voucher Code!`, 'success');
-      });
-    }
-
-    function copyToClipboard(elementId, successMsg) {
-      const el = document.getElementById(elementId);
-      const text = el.value || el.innerText;
-      
-      navigator.clipboard.writeText(text).then(() => {
-        showNotification(successMsg, 'success');
-      }).catch(() => {
-        showNotification(successMsg, 'success');
-      });
-    }
-
-    function setFilterCategory(cat) {
-      currentCategoryFilter = cat;
-      document.querySelectorAll('.filter-tab').forEach(btn => {
-        btn.classList.remove('bg-amber-500', 'text-slate-950', 'font-semibold');
-        btn.classList.add('text-slate-400');
-      });
-
-      const activeBtn = document.getElementById(`filterBtn${cat}`);
-      if (activeBtn) {
-        activeBtn.classList.add('bg-amber-500', 'text-slate-950', 'font-semibold');
-        activeBtn.classList.remove('text-slate-400');
-      }
-
-      renderApp();
-    }
-
-    function filterRecords() {
-      renderApp();
-    }
-
-    function formatDateDisplay(dobString) {
-      if (!dobString) return 'N/A';
-      const parts = dobString.split('-');
-      if (parts.length !== 3) return dobString;
-      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-      const monthIdx = parseInt(parts[1], 10) - 1;
-      return `${parts[2]} ${months[monthIdx]} ${parts[0]}`;
-    }
-
-    function triggerConfetti() {
-      if (typeof confetti === 'function') {
-        confetti({
-          particleCount: 100,
-          spread: 70,
-          origin: { y: 0.6 },
-          colors: ['#f59e0b', '#f97316', '#38bdf8']
-        });
-      }
-    }
-
-    function triggerLogoAnimation() {
-      triggerConfetti();
-      showNotification('Cultural Voyagers — Elevating Luxury Travel', 'info');
+      document.getElementById('addVoyagerForm').reset();
+      document.getElementById('formTitle').innerText = 'Add New Voyager Record';
+      document.getElementById('submitBtn').innerHTML = `<i class="fa-solid fa-floppy-disk mr-1.5"></i> Save Record`;
     }
 
     function scrollToForm() {
       document.getElementById('addFormSection').scrollIntoView({ behavior: 'smooth' });
     }
 
-    function showNotification(msg, type = 'info') {
-      const toast = document.getElementById('toastNotification');
-      const msgEl = document.getElementById('toastMessage');
-      const iconEl = document.getElementById('toastIcon');
+    function openInviteDrawer(id) {
+      const records = getStoredRecords();
+      const r = records.find(item => item.id === id);
+      if (!r) return;
 
-      msgEl.innerText = msg;
-      
+      document.getElementById('drawerRecipientName').innerText = r.name;
+      document.getElementById('drawerRecipientEmail').innerText = r.email;
+      document.getElementById('drawerAvatar').innerText = r.name.substring(0, 2).toUpperCase();
+
+      const voucherCode = `CV-BDAY-${r.name.replace(/\s+/g, '').toUpperCase()}-2026`;
+      document.getElementById('drawerVoucherCode').innerText = voucherCode;
+
+      document.getElementById('drawerShareLink').value = `https://culturalvoyagers.com/invite?code=${voucherCode}`;
+
+      document.getElementById('drawerLetterPreview').innerHTML = `
+        <p>Dear <strong class="text-amber-400">${r.name}</strong>,</p>
+        <p>Warmest wishes from Cultural Voyagers on your special day!</p>
+        <p>As a valued <strong>${r.category}</strong>, we are delighted to present you with an exclusive <strong>PKR 5,000 Luxury Travel Voucher</strong> for your next journey.</p>
+        <p class="text-slate-400 italic">"May your upcoming year be filled with unforgettable destinations and rich experiences."</p>
+      `;
+
+      const overlay = document.getElementById('drawerOverlay');
+      const container = document.getElementById('drawerContainer');
+      overlay.classList.remove('hidden');
+      setTimeout(() => {
+        container.classList.remove('translate-x-full');
+      }, 10);
+    }
+
+    function closeDrawer() {
+      const container = document.getElementById('drawerContainer');
+      const overlay = document.getElementById('drawerOverlay');
+      container.classList.add('translate-x-full');
+      setTimeout(() => {
+        overlay.classList.add('hidden');
+      }, 300);
+    }
+
+    function copyToClipboard(elementId, successMsg) {
+      const elem = document.getElementById(elementId);
+      const textToCopy = elem.value || elem.innerText;
+
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        showNotification(successMsg, 'success');
+      });
+    }
+
+    function showNotification(message, type = 'success') {
+      const toast = document.getElementById('toastNotification');
+      const msgElem = document.getElementById('toastMessage');
+      const iconElem = document.getElementById('toastIcon');
+
+      msgElem.innerText = message;
       if (type === 'success') {
-        iconEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>`;
-      } else if (type === 'warning') {
-        iconEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-amber-400 text-lg"></i>`;
+        iconElem.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400 text-base"></i>`;
       } else {
-        iconEl.innerHTML = `<i class="fa-solid fa-circle-info text-sky-400 text-lg"></i>`;
+        iconElem.innerHTML = `<i class="fa-solid fa-circle-info text-amber-400 text-base"></i>`;
       }
 
       toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
       setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
         toast.classList.add('translate-y-20', 'opacity-0');
       }, 3000);
     }
 
-    // App Initialization on Load
-    window.onload = function() {
-      renderApp();
-      // Auto trigger confetti if there are birthdays today
-      const records = getStoredRecords();
-      const hasToday = records.some(r => calculateDaysLeft(r.dob) === 0);
-      if (hasToday) {
-        setTimeout(triggerConfetti, 800);
+    function triggerConfetti() {
+      if (typeof confetti === 'function') {
+        confetti({
+          particleCount: 80,
+          spread: 70,
+          origin: { y: 0.6 }
+        });
       }
-    };
-  </script>
+    }
 
+    function triggerLogoAnimation() {
+      triggerConfetti();
+      showNotification('Cultural Voyagers Registry Active', 'info');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderApp();
+    });
+  </script>
 </body>
 </html>
