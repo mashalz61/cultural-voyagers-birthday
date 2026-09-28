@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-[#070b19] text-slate-900">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cultural Voyagers — Birthday Voucher</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Great+Vibes&family=Pinyon+Script&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- QRCode generator -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <!-- Confetti animation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/canvas-confetti/1.6.0/confetti.browser.min.js"></script>
+  <!-- Confetti animation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/canvas-confetti/1.6.0/confetti.browser.min.js"></script>
+
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .ticket-box {
+      background: #fdfdfd;
+      border: 3px solid #1e293b;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      position: relative;
+      overflow: hidden;
+      width: 900px;
+      height: 340px;
+    }
+    /* Red Ribbon Divider */
+    .red-ribbon {
+      position: absolute;
+      left: 27%;
+      top: 0;
+      bottom: 0;
+      width: 22px;
+      background: linear-gradient(90deg, #b91c1c, #dc2626, #991b1b);
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+      z-index: 20;
+    }
+    /* Fixed Bow Positioning (Safely shifted left to avoid overlapping logo/text) */
+    .ribbon-bow-container {
+      position: absolute;
+      left: 23.5%;
+      top: 48%;
+      transform: translateY(-50%);
+      z-index: 25;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+    }
+    .bow-loop-left, .bow-loop-right {
+      width: 18px;
+      height: 11px;
+      background: #dc2626;
+      border: 1px solid #991b1b;
+      border-radius: 50% 50% 0 0;
+    }
+    .bow-loop-left {
+      transform: rotate(-35deg);
+      border-bottom: none;
+    }
+    .bow-loop-right {
+      transform: rotate(35deg);
+      border-bottom: none;
+    }
+    .bow-knot-center {
+      width: 11px;
+      height: 11px;
+      background: #ef4444;
+      border-radius: 50%;
+      border: 1px solid #991b1b;
+      z-index: 26;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .bow-tail-left, .bow-tail-right {
+      position: absolute;
+      top: 9px;
+      width: 7px;
+      height: 14px;
+      background: #b91c1c;
+      z-index: 24;
+    }
+    .bow-tail-left {
+      left: 4px;
+      transform: skewX(-15deg);
+      clip-path: polygon(0 0, 100% 0, 50% 100%);
+    }
+    .bow-tail-right {
+      right: 4px;
+      transform: skewX(15deg);
+      clip-path: polygon(0 0, 100% 0, 50% 100%);
+    }
+
+    /* Sparks & Glowing Animation */
+    @keyframes sparkle {
+      0%, 100% { opacity: 0.3; transform: scale(0.8); }
+      50% { opacity: 1; transform: scale(1.2); text-shadow: 0 0 12px rgba(251, 191, 36, 0.9); }
+    }
+    .sparkle-text {
+      animation: sparkle 2s infinite ease-in-out;
+    }
+
+    /* Voucher entrance */
+    @keyframes ticketIn {
+      0%   { opacity: 0; transform: translateY(30px) scale(0.94) rotate(-1deg); }
+      60%  { opacity: 1; transform: translateY(-4px) scale(1.01) rotate(0deg); }
+      100% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
+    }
+    .ticket-box { animation: ticketIn 0.9s cubic-bezier(.2,.8,.2,1) both; }
+
+    /* Shiny light sweep across the voucher */
+    @keyframes shine {
+      0%   { transform: translateX(-120%) skewX(-20deg); }
+      60%, 100% { transform: translateX(420%) skewX(-20deg); }
+    }
+    .ticket-box::after {
+      content: '';
+      position: absolute;
+      top: 0; bottom: 0; left: 0;
+      width: 18%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.55), transparent);
+      pointer-events: none;
+      z-index: 40;
+      animation: shine 4.5s ease-in-out 1.2s infinite;
+    }
+
+    /* Bow gently wiggles */
+    @keyframes bowWiggle {
+      0%, 100% { transform: translateY(-50%) rotate(0deg); }
+      25% { transform: translateY(-50%) rotate(-4deg); }
+      75% { transform: translateY(-50%) rotate(4deg); }
+    }
+    .ribbon-bow-container { animation: bowWiggle 3s ease-in-out infinite; }
+
+    /* Logo soft floating */
+    @keyframes logoFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+    .ticket-box img { animation: logoFloat 4s ease-in-out infinite; }
+
+    /* Buttons fade in */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .flex.gap-3.w-full { animation: fadeUp 0.7s ease 0.8s both; }
+
+    /* PDF / print: no animations, no shine */
+    @media print {
+      * { animation: none !important; }
+      .ticket-box::after { display: none !important; }
+      #ticketScaler { transform: none !important; }
+      #ticketOuter { width: 900px !important; height: 340px !important; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; }
+    }
+  </style>
+</head>
+
+<body class="h-full min-h-screen bg-[#070b19] flex flex-col items-center justify-center p-4">
+
+  <div class="flex flex-col items-center space-y-4">
+
+    <!-- Top Glowing Birthday Header Title -->
+    <div class="text-center">
+      <span class="sparkle-text font-serif text-amber-400 font-bold tracking-widest text-sm uppercase drop-shadow-[0_0_10px_rgba(251,191,36,0.5)]">
+        ✨ Happy Birthday Special Voucher ✨
+      </span>
+    </div>
+
+    <!-- Horizontal Ticket Voucher (wrapper scales it to fit small screens) -->
+    <div id="ticketOuter" style="width:900px; max-width:100%;">
+    <div id="ticketScaler" style="width:900px; transform-origin: top left;">
+    <div class="ticket-box rounded-2xl flex text-slate-900">
+
+      <!-- Red Ribbon & Bow -->
+      <div class="red-ribbon"></div>
+      <div class="ribbon-bow-container">
+        <div class="bow-tail-left"></div>
+        <div class="bow-tail-right"></div>
+        <div class="bow-loop-left"></div>
+        <div class="bow-knot-center"><i class="fa-solid fa-gift text-[5px] text-amber-200"></i></div>
+        <div class="bow-loop-right"></div>
+      </div>
+
+      <!-- Left Section: Title & Official Circular Logo (.jpg) -->
+      <div class="w-[27%] p-6 flex flex-col justify-between relative z-10 bg-slate-50 border-r border-slate-200">
+        <div>
+          <span style="font-family: 'Pinyon Script', cursive;" class="text-amber-700 text-2xl leading-none block -mb-1">Birthday</span>
+          <h1 class="font-serif font-extrabold text-xl text-slate-900 tracking-tight leading-none mt-1">VOUCHER</h1>
+        </div>
+
+        <!-- Official Circular Logo Container -->
+        <div class="my-auto flex flex-col items-center py-1">
+          <div class="w-24 h-24 rounded-full overflow-hidden shadow-md bg-white border border-slate-300 flex items-center justify-center">
+            <img
+              src="logo.jpg"
+              alt="Cultural Voyagers Logo"
+              class="w-full h-full object-cover rounded-full"
+            >
+          </div>
+        </div>
+
+        <!-- Voucher ID Footer -->
+        <div class="text-[10px] text-slate-500 font-mono tracking-wider">
+          ID: CV-BTH-2026
+        </div>
+      </div>
+
+      <!-- Middle Content Section -->
+      <div class="flex-1 p-6 pl-10 flex flex-col justify-between relative z-10 bg-white">
+
+        <!-- Top Header: Brand & Destination Tag -->
+        <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+          <div class="flex items-center space-x-2">
+            <span class="font-serif font-extrabold text-slate-900 tracking-wider text-xs">CULTURAL VOYAGERS</span>
+            <i class="fa-solid fa-plane text-slate-900 text-xs"></i>
+          </div>
+          <div class="flex items-center space-x-1.5 bg-slate-100 px-3 py-0.5 rounded-full border border-slate-200 text-[11px]">
+            <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+            <span class="font-serif font-bold text-slate-800">YOUR DREAM DESTINATION</span>
+          </div>
+        </div>
+
+        <!-- Dynamic User Information Section -->
+        <div class="space-y-3 my-auto">
+          <div class="flex items-baseline text-sm font-bold text-slate-700">
+            <span class="w-20 uppercase tracking-wider text-xs text-slate-500">Name:</span>
+            <span id="clientNameDisplay" class="font-serif text-xl font-bold text-slate-900 border-b border-dashed border-slate-300 pb-0.5 px-2 min-w-[180px] text-slate-400 italic">Enter Name Here</span>
+          </div>
+
+          <div class="flex items-baseline text-sm font-bold text-slate-700">
+            <span class="w-20 uppercase tracking-wider text-xs text-slate-500">Amount:</span>
+            <span id="voucherAmountDisplay" class="font-mono text-xl font-extrabold text-amber-600 border-b border-dashed border-slate-300 pb-0.5 px-2 min-w-[180px] text-slate-400 italic">Amount Empty</span>
+          </div>
+
+          <div class="flex items-baseline text-sm font-bold text-slate-700">
+            <span class="w-20 uppercase tracking-wider text-xs text-slate-500">Validity:</span>
+            <span id="voucherValidityDisplay" class="text-xs font-semibold text-slate-800 tracking-wide">Till Your Next Customize Plan</span>
+          </div>
+        </div>
+
+        <!-- Bottom Tagline -->
+        <div class="pt-1 border-t border-slate-200">
+          <span style="font-family: 'Great Vibes', cursive;" class="text-xl text-slate-800">Your Next Great Adventure Awaits!</span>
+        </div>
+
+      </div>
+
+      <!-- Right Section: QR Code & Verification -->
+      <div class="w-[26%] p-6 flex flex-col items-center justify-center text-center relative z-10 bg-slate-50 border-l border-slate-200">
+        <div class="bg-white p-2 rounded-xl shadow-md border border-slate-200 mb-2 flex items-center justify-center">
+          <div id="qrcode"></div>
+        </div>
+        <p class="font-bold text-[11px] text-slate-900 tracking-wide uppercase">Scan To Be A Part Of Us</p>
+        <span class="text-[9px] text-slate-500 mt-0.5">Instant Verification</span>
+      </div>
+
+    </div>
+    </div>
+    </div>
+
+    <!-- Action Buttons Bar -->
+    <div class="flex gap-3 w-full max-w-[900px]">
+      <button onclick="window.print()" class="flex-1 py-3 rounded-xl bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-300 hover:to-orange-300 text-slate-950 font-bold text-xs uppercase tracking-wider shadow-lg transition">
+        <i class="fa-solid fa-print mr-2"></i> Print / Save Voucher PDF
+      </button>
+      <button onclick="window.close()" class="px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs transition border border-slate-700">
+        Close Window
+      </button>
+    </div>
+
+  </div>
+
+  <script>
+    // Phone par voucher screen ke hisaab se chhota ho jata hai
+    function fitTicket() {
+      const outer = document.getElementById('ticketOuter');
+      const scaler = document.getElementById('ticketScaler');
+      const avail = document.documentElement.clientWidth - 32;
+      const s = Math.min(1, avail / 900);
+      scaler.style.transform = 'scale(' + s + ')';
+      outer.style.width = (900 * s) + 'px';
+      outer.style.height = (340 * s) + 'px';
+    }
+    document.addEventListener('DOMContentLoaded', fitTicket);
+    window.addEventListener('resize', fitTicket);
+    window.addEventListener('orientationchange', fitTicket);
+
+    window.onload = function() {
+      fitTicket();
+      const urlParams = new URLSearchParams(window.location.search);
+      const name = urlParams.get('name');
+      const amount = urlParams.get('amount');
+
+      if (name) {
+        const nameEl = document.getElementById('clientNameDisplay');
+        nameEl.innerText = name;
+        nameEl.classList.remove('text-slate-400', 'italic');
+      }
+
+      if (amount) {
+        const num = Number(amount);
+        const clientAmount = !isNaN(num) && num > 0 ? `${num.toLocaleString()}/- PKR` : amount;
+        const amountEl = document.getElementById('voucherAmountDisplay');
+        amountEl.innerText = clientAmount;
+        amountEl.classList.remove('text-slate-400', 'italic');
+      }
+
+      // QR code seedha website par jayega
+      const qrText = 'https://culturalvoyagers.com/';
+      document.getElementById("qrcode").innerHTML = "";
+      new QRCode(document.getElementById("qrcode"), {
+        text: qrText,
+        width: 90,
+        height: 90,
+        colorDark: "#0f172a",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
+      });
+
+      // Confetti celebration on open
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (typeof confetti === 'function' && !reduce) {
+        const colors = ['#fbbf24', '#f97316', '#dc2626', '#38bdf8', '#ffffff'];
+        setTimeout(() => {
+          confetti({ particleCount: 110, spread: 80, origin: { y: 0.55 }, colors });
+          confetti({ particleCount: 50, angle: 60, spread: 60, origin: { x: 0, y: 0.7 }, colors });
+          confetti({ particleCount: 50, angle: 120, spread: 60, origin: { x: 1, y: 0.7 }, colors });
+        }, 700);
+      }
+    };
+  </script>
+</body>
+</html>

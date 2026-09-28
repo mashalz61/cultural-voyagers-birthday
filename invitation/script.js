@@ -27,7 +27,7 @@ function getClientName() {
     return nameParam.charAt(0).toUpperCase() + nameParam.slice(1);
   }
   // Default fallback updated from "Traveler" to "Voyagers"
-  return "Voyagers";
+  return "Voyager";
 }
 
 document.addEventListener("DOMContentLoaded", () => {
