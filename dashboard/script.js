@@ -1,959 +1,352 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full bg-[#070b19] text-slate-100">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Cultural Voyagers — Birthday Ledger</title>
-
-  <!-- Tailwind CSS -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cultural Voyagers | Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Google Fonts: Inter & Playfair Display -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,800;1,400&display=swap" rel="stylesheet">
-  <!-- FontAwesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Canvas Confetti for Birthday Celebrations -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/canvas-confetti/1.6.0/confetti.browser.min.js"></script>
-  <!-- html2canvas for exporting the voucher card as a downloadable image -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <!-- QRCode generator (renders entirely client-side, no external image requests) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <!-- jsPDF: turns the voucher card into a proper downloadable PDF -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              dark: '#070b19',
-              card: 'rgba(15, 23, 42, 0.75)',
-              gold: '#f59e0b',
-              goldGlow: '#fbbf24',
-              orange: '#f97316',
-              accent: '#38bdf8',
-            }
-          },
-          fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-            serif: ['Playfair Display', 'serif'],
-          },
-          boxShadow: {
-            'glow-gold': '0 0 25px -5px rgba(245, 158, 11, 0.4)',
-            'glow-logo': '0 0 35px 2px rgba(249, 115, 22, 0.35)',
-            'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
-          }
-        }
-      }
-    }
-  </script>
-
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
-    ::-webkit-scrollbar { width: 8px; height: 8px; }
-    ::-webkit-scrollbar-track { background: #070b19; }
-    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #f59e0b; }
-
-    .glass-card {
-      background: rgba(15, 23, 42, 0.7);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    .stamp-card {
-      background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
-      border: 2px dashed rgba(245, 158, 11, 0.4);
-      position: relative;
-    }
-    .stamp-card::before, .stamp-card::after {
-      content: '';
-      position: absolute;
-      width: 20px;
-      height: 20px;
-      background-color: #070b19;
-      border-radius: 50%;
-    }
-    .stamp-card::before { left: -10px; top: 50%; transform: translateY(-50%); }
-    .stamp-card::after { right: -10px; top: 50%; transform: translateY(-50%); }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0px) rotate(0deg); }
-      50% { transform: translateY(-6px) rotate(1deg); }
-    }
-    .floating-logo { animation: float 6s ease-in-out infinite; }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background: #070b19; color: #f8fafc; }
+    .font-cinzel { font-family: 'Cinzel', serif; }
   </style>
 </head>
+<body class="min-h-screen p-4 md:p-8">
 
-<body class="h-full min-h-screen bg-[#070b19] text-slate-100 flex flex-col font-sans selection:bg-amber-500 selection:text-black">
+  <div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+      <div>
+        <a href="../" class="text-xs tracking-widest uppercase text-amber-400 hover:underline mb-2 inline-block">← Back to Portal</a>
+        <h1 class="font-cinzel text-2xl md:text-3xl font-bold bg-gradient-to-r from-white to-amber-300 bg-clip-text text-transparent">Voyager Birthday Dashboard</h1>
+      </div>
+      <a href="../" class="bg-slate-800 border border-slate-700 text-slate-300 hover:text-white px-4 py-2 rounded-xl text-sm transition">Home Portal</a>
+    </div>
 
-  <!-- Top Navigation & Brand Header -->
-  <header class="sticky top-0 z-40 border-b border-slate-800/80 bg-[#070b19]/90 backdrop-blur-md">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center justify-between h-20">
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-2xl backdrop-blur-md">
+        <p class="text-xs text-slate-400 uppercase tracking-wider mb-1">Total Voyagers</p>
+        <h3 id="statTotal" class="text-2xl font-bold font-cinzel text-amber-400">0</h3>
+      </div>
+      <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-2xl backdrop-blur-md">
+        <p class="text-xs text-slate-400 uppercase tracking-wider mb-1">Birthdays Today</p>
+        <h3 id="statToday" class="text-2xl font-bold font-cinzel text-amber-400">0</h3>
+      </div>
+      <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-2xl backdrop-blur-md">
+        <p class="text-xs text-slate-400 uppercase tracking-wider mb-1">Next 7 Days</p>
+        <h3 id="statWeek" class="text-2xl font-bold font-cinzel text-amber-400">0</h3>
+      </div>
+      <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-2xl backdrop-blur-md">
+        <p class="text-xs text-slate-400 uppercase tracking-wider mb-1">Next 30 Days</p>
+        <h3 id="statMonth" class="text-2xl font-bold font-cinzel text-amber-400">0</h3>
+      </div>
+    </div>
 
-        <div class="flex items-center space-x-4">
-          <div class="relative group cursor-pointer" onclick="triggerLogoAnimation()">
-            <div class="absolute -inset-1 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full blur opacity-60 group-hover:opacity-100 transition duration-500"></div>
-            <div class="relative w-14 h-14 rounded-full overflow-hidden border-2 border-amber-400/80 shadow-glow-logo floating-logo bg-slate-900 flex items-center justify-center shrink-0">
-              <img
-                id="brandLogo"
-                src="logo.jpg"
-                alt="Cultural Voyagers Logo"
-                class="w-full h-full object-cover"
-                onerror="this.style.display='none'; document.getElementById('logoFallback').classList.remove('hidden');"
-              >
-              <span id="logoFallback" class="hidden font-serif font-bold text-amber-400 text-base tracking-wider">CV</span>
-            </div>
+    <!-- Today Alert Banner -->
+    <div id="todayAlert" class="hidden bg-gradient-to-r from-amber-500/20 via-amber-500/10 to-transparent border border-amber-500/30 p-6 rounded-2xl mb-8">
+      <h2 class="font-cinzel text-lg font-bold text-amber-300 mb-3">🎉 Today's Birthdays!</h2>
+      <div id="todayCards" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+    </div>
+
+    <!-- Main Content Layout (Form + Table) -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      
+      <!-- Add Voyager Form -->
+      <div class="bg-slate-900/60 border border-slate-800 p-6 rounded-2xl backdrop-blur-md h-fit">
+        <h2 class="font-cinzel text-lg font-bold text-white mb-4">Add New Voyager</h2>
+        <form id="birthdayForm" class="space-y-4">
+          <div>
+            <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Full Name</label>
+            <input type="text" id="nameInput" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-amber-400">
           </div>
           <div>
-            <div class="flex items-center space-x-2">
-              <h1 class="font-serif text-xl sm:text-2xl font-bold tracking-tight text-white">CULTURAL VOYAGERS</h1>
-              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/30">Ledger</span>
-            </div>
-            <p class="text-xs text-slate-400 hidden sm:block">Luxury Travel Client Birthday & Special Occasion Registry</p>
+            <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Email Address</label>
+            <input type="email" id="emailInput" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-amber-400">
           </div>
-        </div>
-
-        <div class="flex items-center space-x-3">
-          <button
-            onclick="scrollToForm()"
-            class="hidden sm:inline-flex items-center px-4 py-2 rounded-xl text-sm font-semibold text-slate-950 bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-300 hover:to-orange-300 shadow-glow-gold hover:scale-105 transition duration-200"
-          >
-            <i class="fa-solid fa-plus mr-2 font-bold"></i> Add Voyager
-          </button>
-          <button
-            onclick="showNotification('Database synchronized with local storage', 'info')"
-            class="p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white transition border border-slate-700/60"
-            title="Sync Ledger"
-          >
-            <i class="fa-solid fa-arrows-rotate text-sm"></i>
-          </button>
-        </div>
-
+          <div>
+            <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Category</label>
+            <input type="text" id="categoryInput" placeholder="e.g. VIP Voyager, Partner" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-amber-400">
+          </div>
+          <div>
+            <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Birthday Date</label>
+            <input type="date" id="dateInput" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-amber-400">
+          </div>
+          <button type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-3 rounded-xl transition cursor-pointer">Save Voyager Record</button>
+        </form>
       </div>
-    </div>
-  </header>
 
-  <!-- Main Content Layout -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      <!-- Records Table Section -->
+      <div class="lg:col-span-2 bg-slate-900/60 border border-slate-800 p-6 rounded-2xl backdrop-blur-md">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+          <h2 class="font-cinzel text-lg font-bold text-white">Voyager Directory</h2>
+          <input type="text" id="searchInput" placeholder="Search by name, email..." class="bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-amber-400 w-full sm:w-64">
+        </div>
 
-    <!-- KPI Overview Section -->
-    <section class="grid grid-cols-1 sm:grid-cols-3 gap-5">
-      <div class="glass-card rounded-2xl p-6 relative overflow-hidden group hover:border-slate-700 transition">
-        <div class="absolute -right-4 -bottom-4 opacity-10 group-hover:opacity-20 transition duration-300">
-          <i class="fa-solid fa-users text-8xl text-slate-100"></i>
-        </div>
-        <div class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">Total Voyagers</div>
-        <div class="flex items-baseline space-x-3">
-          <span id="kpiTotalCount" class="text-4xl font-extrabold text-white">0</span>
-          <span class="text-xs text-slate-400 font-medium">Registered Records</span>
-        </div>
-        <div class="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
-          <span>Active Accounts</span>
-          <span class="text-emerald-400 font-semibold"><i class="fa-solid fa-circle text-[8px] mr-1"></i> Sync Live</span>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm">
+            <thead>
+              <tr class="border-b border-slate-800 text-slate-400 text-xs uppercase tracking-wider">
+                <th class="pb-3 font-semibold">Name</th>
+                <th class="pb-3 font-semibold">Email</th>
+                <th class="pb-3 font-semibold">Category</th>
+                <th class="pb-3 font-semibold">Birthday</th>
+                <th class="pb-3 font-semibold">Countdown</th>
+                <th class="pb-3 font-semibold">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody" class="divide-y divide-slate-800/60"></tbody>
+          </table>
+          <p id="emptyMsg" class="hidden text-center py-8 text-slate-500 text-sm">No voyager records found.</p>
         </div>
       </div>
 
-      <div class="glass-card rounded-2xl p-6 relative overflow-hidden group border border-amber-500/30 hover:border-amber-500/60 transition shadow-glow-gold">
-        <div class="absolute -right-4 -bottom-4 opacity-10 group-hover:opacity-25 transition duration-300">
-          <i class="fa-solid fa-cake-candles text-8xl text-amber-400"></i>
-        </div>
-        <div class="text-amber-400 text-xs font-bold uppercase tracking-wider mb-1 flex items-center justify-between">
-          <span>Celebrating Today</span>
-          <span class="animate-pulse flex h-2 w-2 rounded-full bg-amber-400"></span>
-        </div>
-        <div class="flex items-baseline space-x-3">
-          <span id="kpiTodayCount" class="text-4xl font-extrabold text-amber-300">0</span>
-          <span class="text-xs text-amber-200/80 font-medium">Voyager Birthdays</span>
-        </div>
-        <div class="mt-4 pt-3 border-t border-amber-500/20 flex items-center justify-between text-xs text-amber-300/80">
-          <span>Action Required</span>
-          <button onclick="triggerConfetti()" class="hover:underline text-amber-400 font-medium">
-            <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Celebrate
-          </button>
-        </div>
-      </div>
-
-      <div class="glass-card rounded-2xl p-6 relative overflow-hidden group hover:border-slate-700 transition">
-        <div class="absolute -right-4 -bottom-4 opacity-10 group-hover:opacity-20 transition duration-300">
-          <i class="fa-solid fa-calendar-week text-8xl text-sky-400"></i>
-        </div>
-        <div class="text-sky-400 text-xs font-bold uppercase tracking-wider mb-1">Upcoming (Next 7 Days)</div>
-        <div class="flex items-baseline space-x-3">
-          <span id="kpiUpcomingCount" class="text-4xl font-extrabold text-white">0</span>
-          <span class="text-xs text-slate-400 font-medium">Imminent Celebrations</span>
-        </div>
-        <div class="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
-          <span>Next 7 Days</span>
-          <span class="text-sky-400 font-medium"><i class="fa-solid fa-clock-rotate-left mr-1"></i> Auto-Calculated</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- Voucher Amount Setting (dashboard-level control) -->
-    <!-- Celebrating Today Spotlight Banner -->
-    <section id="todaySpotlightSection" class="space-y-4">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center space-x-2">
-          <div class="w-3 h-3 rounded-full bg-amber-500 animate-ping"></div>
-          <h2 class="font-serif text-xl font-bold text-white tracking-wide">TODAY'S SPECIAL CELEBRATIONS</h2>
-        </div>
-        <span id="spotlightVoucherBadge" class="text-xs text-amber-400/90 font-mono bg-amber-500/10 border border-amber-500/20 px-3 py-1 rounded-full">
-          <i class="fa-solid fa-gift mr-1"></i> Personalized Travel Voucher Eligible
-        </span>
-      </div>
-      <div id="todaySpotlightGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-    </section>
-
-    <!-- Records Directory Header & Filter Toolbar -->
-    <section class="glass-card rounded-2xl p-6 space-y-6">
-
-      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-800 pb-5">
-        <div>
-          <h2 class="font-serif text-xl font-bold text-white">Voyager Records Ledger</h2>
-          <p class="text-xs text-slate-400 mt-0.5">Filter, search, and generate client birthday vouchers & invites.</p>
-        </div>
-
-        <div class="flex flex-wrap items-center gap-3">
-          <div class="relative min-w-[220px]">
-            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-            <input
-              type="text" id="searchInput" oninput="filterRecords()"
-              placeholder="Search name, email, category..."
-              class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl pl-9 pr-4 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500 transition"
-            >
-          </div>
-
-          <div class="flex items-center bg-slate-900/90 p-1 rounded-xl border border-slate-800 text-xs">
-            <button onclick="setFilterCategory('ALL')" id="filterBtnALL" class="filter-tab px-3 py-1.5 rounded-lg font-medium transition bg-amber-500 text-slate-950 font-semibold">All</button>
-            <button onclick="setFilterCategory('TODAY')" id="filterBtnTODAY" class="filter-tab px-3 py-1.5 rounded-lg font-medium transition text-slate-400 hover:text-white">Today 🎉</button>
-            <button onclick="setFilterCategory('UPCOMING')" id="filterBtnUPCOMING" class="filter-tab px-3 py-1.5 rounded-lg font-medium transition text-slate-400 hover:text-white">Upcoming</button>
-          </div>
-
-          <div class="flex items-center space-x-2">
-            <button
-              onclick="exportToExcel()"
-              class="px-3.5 py-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/40 text-xs font-semibold flex items-center transition shadow-sm"
-              title="Export records to Microsoft Excel / CSV"
-            >
-              <i class="fa-solid fa-file-excel mr-1.5 text-emerald-400"></i> Export to Excel
-            </button>
-            <label
-              class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/80 text-xs font-semibold flex items-center cursor-pointer transition"
-              title="Import CSV File"
-            >
-              <i class="fa-solid fa-file-import mr-1.5 text-sky-400"></i> Import CSV
-              <input type="file" id="csvFileInput" accept=".csv" onchange="importCSV(event)" class="hidden">
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm text-slate-300">
-          <thead class="bg-slate-900/80 text-xs uppercase tracking-wider text-slate-400 border-b border-slate-800">
-            <tr>
-              <th scope="col" class="py-3.5 px-4 font-semibold">Voyager Name</th>
-              <th scope="col" class="py-3.5 px-4 font-semibold">Contact Email</th>
-              <th scope="col" class="py-3.5 px-4 font-semibold">Category</th>
-              <th scope="col" class="py-3.5 px-4 font-semibold">Voucher (PKR)</th>
-              <th scope="col" class="py-3.5 px-4 font-semibold">Date of Birth</th>
-              <th scope="col" class="py-3.5 px-4 font-semibold">Days Until</th>
-              <th scope="col" class="py-3.5 px-4 font-semibold text-right">Quick Actions</th>
-            </tr>
-          </thead>
-          <tbody id="recordsTableBody" class="divide-y divide-slate-800/60 font-sans"></tbody>
-        </table>
-
-        <div id="emptyState" class="hidden py-12 text-center">
-          <div class="w-16 h-16 mx-auto mb-3 rounded-full bg-slate-800/80 flex items-center justify-center text-slate-500 text-xl">
-            <i class="fa-solid fa-folder-open"></i>
-          </div>
-          <h3 class="text-sm font-semibold text-slate-300">No records found</h3>
-          <p class="text-xs text-slate-500 mt-1">Try adjusting your search filter or add a new voyager below.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Form Section -->
-    <section id="addFormSection" class="glass-card rounded-2xl p-6 space-y-6">
-      <div class="border-b border-slate-800 pb-4 flex items-center justify-between">
-        <div>
-          <h2 id="formTitle" class="font-serif text-xl font-bold text-white">Add New Voyager Record</h2>
-          <p class="text-xs text-slate-400 mt-0.5">Register a new client, staff, or partner into the Cultural Voyagers birthday system.</p>
-        </div>
-        <span class="text-xs text-slate-500 bg-slate-800 px-2.5 py-1 rounded-lg">
-          <i class="fa-solid fa-shield-halved mr-1 text-emerald-400"></i> Encrypted Local Storage
-        </span>
-      </div>
-
-      <form id="addVoyagerForm" onsubmit="handleFormSubmit(event)" class="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <div class="space-y-1.5">
-          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wide" for="inputName">Full Name <span class="text-amber-400">*</span></label>
-          <div class="relative">
-            <i class="fa-solid fa-user absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
-            <input type="text" id="inputName" required placeholder="e.g. Sanober Khan"
-              class="w-full bg-slate-900 border border-slate-700/80 rounded-xl pl-9 pr-4 py-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500 transition">
-          </div>
-        </div>
-
-        <div class="space-y-1.5">
-          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wide" for="inputEmail">Email Address <span class="text-amber-400">*</span></label>
-          <div class="relative">
-            <i class="fa-solid fa-envelope absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
-            <input type="email" id="inputEmail" required placeholder="e.g. sanober@culturalvoyagers.com"
-              class="w-full bg-slate-900 border border-slate-700/80 rounded-xl pl-9 pr-4 py-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500 transition">
-          </div>
-        </div>
-
-        <div class="space-y-1.5">
-          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wide" for="inputDob">Date of Birth <span class="text-amber-400">*</span></label>
-          <input type="date" id="inputDob" required
-            class="w-full bg-slate-900 border border-slate-700/80 rounded-xl px-4 py-2 text-xs text-slate-100 focus:outline-none focus:border-amber-500 transition [color-scheme:dark]">
-        </div>
-
-        <div class="space-y-1.5">
-          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wide" for="inputCategory">Category / Relation <span class="text-amber-400">*</span></label>
-          <select id="inputCategory" required
-            class="w-full bg-slate-900 border border-slate-700/80 rounded-xl px-4 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-amber-500 transition">
-            <option value="VIP Client">VIP Client</option>
-            <option value="Staff">Staff</option>
-            <option value="Travel Partner">Travel Partner</option>
-            <option value="Family">Family</option>
-          </select>
-        </div>
-
-        <div class="space-y-1.5 md:col-span-2">
-          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wide" for="inputAmount">Birthday Voucher Amount (PKR) <span class="text-amber-400">*</span></label>
-          <div class="relative max-w-xs">
-            <i class="fa-solid fa-ticket absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
-            <input type="number" id="inputAmount" required min="0" step="500" value="5000" placeholder="e.g. 5000"
-              class="w-full bg-slate-900 border border-slate-700/80 rounded-xl pl-9 pr-4 py-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500 transition">
-          </div>
-          <p class="text-[11px] text-slate-500">This client's own voucher amount — different clients can have different amounts.</p>
-        </div>
-
-        <div class="md:col-span-2 flex items-center justify-end space-x-3 pt-2">
-          <button type="button" onclick="resetForm()" class="px-5 py-2.5 rounded-xl border border-slate-700 text-xs font-semibold text-slate-300 hover:bg-slate-800 transition">Clear Form</button>
-          <button type="submit" id="submitBtn" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-300 hover:to-orange-300 text-slate-950 font-semibold text-xs shadow-glow-gold hover:scale-105 transition duration-200">
-            <i class="fa-solid fa-floppy-disk mr-1.5"></i> Save Record
-          </button>
-        </div>
-      </form>
-    </section>
-
-  </main>
-
-  <!-- Slide-out Drawer -->
-  <div id="drawerOverlay" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden transition-opacity duration-300" onclick="closeDrawer()">
-    <div
-      id="drawerContainer"
-      class="fixed inset-y-0 right-0 max-w-md w-full bg-[#0b1329] border-l border-slate-800 p-6 shadow-2xl flex flex-col justify-between overflow-y-auto transform translate-x-full transition-transform duration-300"
-      onclick="event.stopPropagation()"
-    >
-      <div>
-        <div class="flex items-center justify-between pb-4 border-b border-slate-800">
-          <div class="flex items-center space-x-3">
-            <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
-              <i class="fa-solid fa-paper-plane text-lg"></i>
-            </div>
-            <div>
-              <h3 class="font-serif font-bold text-lg text-white">GENERATE WISH</h3>
-              <p class="text-xs text-slate-400">Cultural Voyagers Birthday Voucher</p>
-            </div>
-          </div>
-          <button onclick="closeDrawer()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition">
-            <i class="fa-solid fa-xmark text-lg"></i>
-          </button>
-        </div>
-
-        <div class="mt-6 space-y-5">
-          <div class="bg-slate-900/90 rounded-xl p-3.5 border border-slate-800 flex items-center space-x-3">
-            <div id="drawerAvatar" class="w-10 h-10 rounded-full bg-gradient-to-tr from-amber-500 to-orange-400 text-slate-950 font-bold flex items-center justify-center text-sm">CV</div>
-            <div>
-              <p id="drawerRecipientName" class="text-sm font-bold text-white">Recipient Name</p>
-              <p id="drawerRecipientEmail" class="text-xs text-slate-400">recipient@email.com</p>
-            </div>
-          </div>
-
-          <div class="space-y-1.5">
-            <label class="text-xs font-semibold text-slate-300 uppercase tracking-wide">Invitation Template</label>
-            <div id="drawerLetterPreview" class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 text-xs text-slate-300 space-y-2 leading-relaxed font-sans"></div>
-          </div>
-
-          <div class="space-y-2">
-            <label class="text-xs font-semibold text-slate-300 uppercase tracking-wide">Quick Links</label>
-            <a id="drawerInvitationBtn" href="#" target="_blank"
-              class="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-sky-500/10 hover:bg-sky-500/20 text-sky-300 border border-sky-500/30 text-xs font-semibold transition">
-              <i class="fa-solid fa-envelope-open-text"></i> View Your Birthday Invitation
-            </a>
-            <a id="drawerVoucherLinkBtn" href="#" target="_blank"
-              class="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-semibold transition">
-              <i class="fa-solid fa-gift"></i> Open Birthday Voucher Page
-            </a>
-            <button onclick="viewAndDownloadVoucher()"
-              class="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-semibold transition">
-              <i class="fa-solid fa-file-pdf"></i> View / Download Voucher (PDF)
-            </button>
-          </div>
-
-          <!-- The full birthday voucher is generated as a PDF (see Quick Links above)
-               and is intentionally NOT shown in the dashboard — it lives off-screen
-               here purely so the PDF generator can capture it. -->
-          <div style="position:absolute; left:-9999px; top:-9999px;" aria-hidden="true">
-              <div id="voucherFullCapture" style="width:900px; height:330px; position:relative; background:#f4f5f7; border-radius:18px; overflow:hidden; border:6px solid #1b1440; box-sizing:border-box; font-family: Inter, sans-serif;">
-                  <div style="position:absolute; inset:6px; border:2px solid #8778a8; border-radius:12px; pointer-events:none;"></div>
-                  <div style="display:flex; height:100%;">
-                    <!-- Left: title + logo -->
-                    <div style="width:190px; padding:22px; display:flex; flex-direction:column; justify-content:space-between; background:#eceef2; flex-shrink:0;">
-                      <div style="font-family:'Playfair Display',serif; font-weight:800; font-size:22px; color:#1b1440; line-height:1.15;">Birthday<br>Voucher</div>
-                      <div style="width:112px; height:112px; border-radius:50%; box-shadow:0 0 0 3px #1b1440; overflow:hidden;">
-                        <svg viewBox="0 0 120 120" width="112" height="112">
-                          <defs>
-                            <linearGradient id="cvGoldGrad" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="0%" stop-color="#f6c453"/>
-                              <stop offset="100%" stop-color="#e8912a"/>
-                            </linearGradient>
-                          </defs>
-                          <circle cx="60" cy="60" r="60" fill="#151233"/>
-                          <path d="M0,55 A60,60 0 0 1 120,55 L120,60 L0,60 Z" fill="url(#cvGoldGrad)"/>
-                          <rect x="24" y="36" width="8" height="19" fill="#151233"/>
-                          <rect x="35" y="28" width="10" height="27" fill="#151233"/>
-                          <rect x="49" y="40" width="7" height="15" fill="#151233"/>
-                          <polygon points="70,55 78,29 86,55" fill="#151233"/>
-                          <line x1="78" y1="29" x2="78" y2="14" stroke="#151233" stroke-width="2"/>
-                          <circle cx="78" cy="12" r="2.6" fill="#151233"/>
-                          <text x="60" y="90" text-anchor="middle" font-family="'Playfair Display', serif" font-style="italic" font-weight="700" font-size="15" fill="#ffffff">Cultural</text>
-                          <text x="60" y="106" text-anchor="middle" font-family="'Playfair Display', serif" font-style="italic" font-weight="700" font-size="15" fill="#ffffff">Voyagers</text>
-                        </svg>
-                      </div>
-                    </div>
-
-                    <!-- Ribbon divider -->
-                    <div style="width:32px; flex-shrink:0; background:linear-gradient(180deg,#d3202f,#8f0f1c); position:relative;">
-                      <div style="position:absolute; top:50%; left:50%; width:54px; height:54px; margin-left:-27px; margin-top:-27px; background:#d3202f; border-radius:50%; box-shadow:0 0 0 4px #8f0f1c;"></div>
-                    </div>
-
-                    <!-- Main content -->
-                    <div style="flex:1; padding:20px 24px; position:relative; background:radial-gradient(rgba(0,0,0,0.05) 1px, transparent 1.5px) 0 0/20px 20px, #f4f5f7;">
-                      <div style="display:flex; align-items:center; gap:10px; margin-bottom:20px;">
-                        <span style="font-family:'Playfair Display',serif; font-weight:800; font-size:19px; color:#151233; letter-spacing:0.3px;">CULTURAL VOYAGERS</span>
-                        <span style="font-size:18px;">&#9992;</span>
-                        <span style="margin-left:auto; background:#e4e4ea; padding:6px 12px; border-radius:16px; font-size:10px; font-weight:700; color:#151233; letter-spacing:0.4px; white-space:nowrap;">YOUR DREAM DESTINATION</span>
-                      </div>
-                      <div style="font-size:13px; color:#3c3c46; line-height:2.3;">
-                        <div><span style="font-weight:600;">NAME:</span> <span id="voucherFullName" style="font-weight:700; color:#151233;">—</span></div>
-                        <div><span style="font-weight:600;">AMOUNT:</span> <span id="voucherFullAmount" style="font-weight:800; color:#c81e2c;">PKR 5,000/-</span></div>
-                        <div><span style="font-weight:600;">VOUCHER VALIDITY:</span> <span id="voucherFullValidity" style="font-weight:700; color:#151233;">Till your next customize plan</span></div>
-                      </div>
-                      <div id="voucherFullId" style="position:absolute; bottom:14px; left:24px; font-size:10px; color:#9797a3; font-family:monospace;">ID: CV-BTH-2026</div>
-                    </div>
-
-                    <!-- QR section -->
-                    <div style="width:150px; flex-shrink:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; padding:14px; background:#f4f5f7;">
-                      <div id="voucherQrCode" style="width:104px; height:104px; background:#ffffff; border-radius:8px; display:flex; align-items:center; justify-content:center; overflow:hidden;"></div>
-                      <div style="font-size:10.5px; font-weight:700; color:#151233; text-align:center;">Scan To Be A Part of Us</div>
-                    </div>
-                  </div>
-              </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="pt-6 border-t border-slate-800 space-y-2">
-        <p class="text-[10px] text-slate-500 text-center leading-relaxed">
-          The invitation and voucher links are included in the email automatically. Just review and press Send in Gmail.
-        </p>
-        <button onclick="sendViaGmail()"
-          class="w-full py-3 rounded-xl bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-300 hover:to-blue-400 text-slate-950 font-bold text-xs uppercase tracking-wider shadow-glow-gold transition flex items-center justify-center gap-2">
-          <i class="fa-brands fa-google"></i> SEND WISH VIA GMAIL
-        </button>
-        <button onclick="copyVoucherCode()"
-          class="w-full py-3 rounded-xl bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-300 hover:to-orange-300 text-slate-950 font-bold text-xs uppercase tracking-wider shadow-glow-gold transition">
-          <i class="fa-solid fa-ticket mr-1.5"></i> COPY VOUCHER CODE
-        </button>
-        <button onclick="closeDrawer()" class="w-full py-2.5 rounded-xl border border-slate-800 text-slate-400 hover:text-white text-xs font-semibold transition">Close Drawer</button>
-      </div>
     </div>
   </div>
 
-  <!-- Notification Toast -->
-  <div id="toastNotification" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
-    <div class="bg-slate-900 border border-amber-500/50 text-slate-100 px-4 py-3 rounded-xl shadow-2xl flex items-center space-x-3">
-      <div id="toastIcon" class="text-amber-400"><i class="fa-solid fa-circle-check"></i></div>
-      <div id="toastMessage" class="text-xs font-semibold">Notification text</div>
+  <!-- Invite Drawer Overlay -->
+  <div id="drawerOverlay" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden transition-opacity">
+    <div id="drawerContainer" class="absolute right-0 top-0 h-full w-full max-w-lg bg-slate-900 border-l border-slate-800 p-6 overflow-y-auto transform translate-x-full transition-transform duration-300">
+      <div class="flex justify-between items-center mb-6 border-b border-slate-800 pb-4">
+        <h3 class="font-cinzel text-xl font-bold text-amber-300">Send Invitation & Voucher</h3>
+        <button onclick="closeInviteDrawer()" class="text-slate-400 hover:text-white text-xl font-bold">&times;</button>
+      </div>
+
+      <!-- Recipient Badge -->
+      <div class="flex items-center gap-4 bg-slate-950/60 p-4 rounded-xl border border-slate-800 mb-6">
+        <div id="drawerAvatar" class="w-12 h-12 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 font-bold flex items-center justify-content: center text-lg"></div>
+        <div>
+          <h4 id="drawerRecipientName" class="font-bold text-white"></h4>
+          <p id="drawerRecipientEmail" class="text-xs text-slate-400"></p>
+        </div>
+      </div>
+
+      <!-- Letter Preview -->
+      <div class="mb-6">
+        <label class="block text-xs uppercase tracking-wider text-slate-400 mb-2">Personalized Letter Preview</label>
+        <div id="drawerLetterPreview" class="bg-slate-950 border border-slate-800 rounded-xl p-4 text-sm text-slate-300 space-y-3 leading-relaxed"></div>
+      </div>
+
+      <!-- Voucher Code & Link Sharing -->
+      <div class="space-y-4 mb-6">
+        <div>
+          <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Generated Voucher Code</label>
+          <div class="bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-amber-400 font-mono font-bold text-sm" id="drawerVoucherCode"></div>
+        </div>
+        <div>
+          <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Direct Invitation Link</label>
+          <div class="flex gap-2">
+            <input type="text" id="drawerShareLink" readonly class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-300 focus:outline-none">
+            <button id="copyBtn" onclick="copyInviteLink()" class="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-xl text-xs font-semibold transition">Copy</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="space-y-3">
+        <button onclick="sendViaGmail()" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-3 rounded-xl transition flex items-center justify-center gap-2 cursor-pointer">
+          <span>✉️ Send via Gmail Draft</span>
+        </button>
+        <button onclick="viewVoucher()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold py-3 rounded-xl transition flex items-center justify-center gap-2 cursor-pointer">
+          <span>🎁 Preview Voucher Page</span>
+        </button>
+      </div>
+
     </div>
   </div>
 
+  <!-- JavaScript Logic with LocalStorage -->
   <script>
-    const INVITATION_BASE_URL = 'https://glowing-tarsier-6e7668.netlify.app/';
-    const VOUCHER_BASE_URL = 'https://lighthearted-rugelach-b971a6.netlify.app/';
-    const SENDER_GMAIL_ACCOUNT = 'mashalzahra161@gmail.com';
-
-    const INITIAL_VOYAGERS = [
-      { id: '1', name: 'Sanober K.', email: 'sanoberk@gmail.com', dob: getTodayFormatted(0), category: 'VIP Client', amount: 5000 },
-      { id: '2', name: 'Omar R.', email: 'omarr@gmail.com', dob: getTodayFormatted(0), category: 'VIP Client', amount: 7500 },
-      { id: '3', name: 'Nadhir A.', email: 'nadh@gmail.com', dob: getTodayFormatted(3), category: 'Family', amount: 3000 },
-      { id: '4', name: 'Darxin M.', email: 'darxiin@gmail.com', dob: getTodayFormatted(6), category: 'Staff', amount: 4000 },
-      { id: '5', name: 'Nimra S.', email: 'nim@gmail.com', dob: '1995-11-14', category: 'Travel Partner', amount: 5000 },
-    ];
-
-    let currentCategoryFilter = 'ALL';
-    let currentEditingId = null;
-    let currentGmailUrl = null;
-    let currentVoucherUrl = '';
-    let currentVoucherCode = '';
-
-    function getTodayFormatted(offsetDays = 0) {
-      const today = new Date();
-      today.setDate(today.getDate() + offsetDays);
-      const yyyy = today.getFullYear();
-      const mm = String(today.getMonth() + 1).padStart(2, '0');
-      const dd = String(today.getDate()).padStart(2, '0');
-      return `${yyyy}-${mm}-${dd}`;
-    }
-
-    function formatDateDisplay(dobString) {
-      if (!dobString) return '';
-      const date = new Date(dobString);
-      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    }
+    // ================= Storage =================
+    const STORAGE_KEY = 'cvBirthdayRecords';
 
     function getStoredRecords() {
-      const stored = localStorage.getItem('cultural_voyagers_ledger');
-      if (!stored) {
-        localStorage.setItem('cultural_voyagers_ledger', JSON.stringify(INITIAL_VOYAGERS));
-        return INITIAL_VOYAGERS;
+      try {
+        let data = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        // Agar localStorage khali ho toh sample records daal dein taaki shuru mein khali na lage
+        if (!data || data.length === 0) {
+          data = [
+            { id: 1, name: "Ayesha Khan", email: "ayesha@example.com", category: "Voyager", date: "2026-10-05" },
+            { id: 2, name: "Bilal Ahmed", email: "bilal@example.com", category: "Partner", date: "2026-10-15" }
+          ];
+          saveRecords(data);
+        }
+        return data;
+      } catch (e) {
+        return [];
       }
-      try { return JSON.parse(stored); } catch (e) { return INITIAL_VOYAGERS; }
     }
 
-    function saveStoredRecords(records) {
-      localStorage.setItem('cultural_voyagers_ledger', JSON.stringify(records));
-      renderApp();
+    function saveRecords(records) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
     }
 
-    // Each voyager carries their own voucher amount now (set in the Add/Edit form),
-    // so there is no single global amount anymore. This just provides a safe fallback
-    // for older records saved before this field existed.
-    function getRecordAmount(r) {
-      const amount = parseInt(r && r.amount, 10);
-      return isNaN(amount) ? 5000 : amount;
+    // ================= Helpers =================
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
     }
 
-    function calculateDaysLeft(dobString) {
-      if (!dobString) return 999;
+    function daysUntilBirthday(dateStr) {
+      const [, m, d] = dateStr.split('-').map(Number);
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      const dob = new Date(dobString);
-      const currentYear = today.getFullYear();
-      let nextBday = new Date(currentYear, dob.getMonth(), dob.getDate());
-      nextBday.setHours(0, 0, 0, 0);
-      if (nextBday < today) nextBday.setFullYear(currentYear + 1);
-      const diffTime = nextBday - today;
-      return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      let next = new Date(today.getFullYear(), m - 1, d);
+      if (next < today) next = new Date(today.getFullYear() + 1, m - 1, d);
+
+      return Math.round((next - today) / 86400000);
     }
 
-    function exportToExcel() {
+    function formatBirthday(dateStr) {
+      const [y, m, d] = dateStr.split('-').map(Number);
+      return new Date(y, m - 1, d).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+    }
+
+    // ================= Render =================
+    function renderAll() {
       const records = getStoredRecords();
-      if (records.length === 0) {
-        showNotification('No records available to export', 'info');
-        return;
-      }
-      let csvContent = "data:text/csv;charset=utf-8,";
-      csvContent += "ID,Full Name,Email Address,Date of Birth,Category,Voucher Amount (PKR),Days Until Birthday\n";
-      records.forEach(r => {
-        const daysLeft = calculateDaysLeft(r.dob);
-        const nameEscaped = `"${r.name.replace(/"/g, '""')}"`;
-        const emailEscaped = `"${r.email.replace(/"/g, '""')}"`;
-        const categoryEscaped = `"${r.category.replace(/"/g, '""')}"`;
-        csvContent += `${r.id},${nameEscaped},${emailEscaped},${r.dob},${categoryEscaped},${getRecordAmount(r)},${daysLeft}\n`;
-      });
-      const encodedUri = encodeURI(csvContent);
-      const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", `Cultural_Voyagers_Birthdays_${getTodayFormatted(0)}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      showNotification('Excel sheet downloaded successfully!', 'success');
-    }
+      const query = document.getElementById('searchInput').value.trim().toLowerCase();
 
-    function importCSV(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const text = e.target.result;
-        const lines = text.split('\n');
-        let addedCount = 0;
-        let records = getStoredRecords();
-        for (let i = 1; i < lines.length; i++) {
-          const line = lines[i].trim();
-          if (!line) continue;
-          const cols = line.split(',').map(c => c.replace(/^"|"$/g, '').trim());
-          if (cols.length >= 4) {
-            const name = cols[1] || cols[0];
-            const email = cols[2] || cols[1];
-            const dob = cols[3] || cols[2];
-            const category = cols[4] || 'VIP Client';
-            const amount = parseInt(cols[5], 10) || 5000;
-            if (name && dob) {
-              records.push({ id: Date.now().toString() + Math.random().toString(36).substr(2, 4), name, email, dob, category, amount });
-              addedCount++;
-            }
-          }
-        }
-        saveStoredRecords(records);
-        showNotification(`Imported ${addedCount} records from CSV file!`, 'success');
-        event.target.value = '';
-      };
-      reader.readAsText(file);
-    }
+      // Stats
+      const withDays = records.map(r => ({ ...r, days: daysUntilBirthday(r.date) }));
+      document.getElementById('statTotal').innerText = records.length;
+      document.getElementById('statToday').innerText = withDays.filter(r => r.days === 0).length;
+      document.getElementById('statWeek').innerText = withDays.filter(r => r.days <= 7).length;
+      document.getElementById('statMonth').innerText = withDays.filter(r => r.days <= 30).length;
 
-    function renderApp() {
-      const records = getStoredRecords();
-      records.sort((a, b) => calculateDaysLeft(a.dob) - calculateDaysLeft(b.dob));
-      renderKPIs(records);
-      renderTodaySpotlight(records);
-      renderTable(records);
-    }
-
-    function renderKPIs(records) {
-      const total = records.length;
-      const todayCount = records.filter(r => calculateDaysLeft(r.dob) === 0).length;
-      const upcomingCount = records.filter(r => { const d = calculateDaysLeft(r.dob); return d > 0 && d <= 7; }).length;
-      document.getElementById('kpiTotalCount').innerText = total;
-      document.getElementById('kpiTodayCount').innerText = todayCount;
-      document.getElementById('kpiUpcomingCount').innerText = upcomingCount;
-    }
-
-    function renderTodaySpotlight(records) {
-      const container = document.getElementById('todaySpotlightGrid');
-      const todayRecords = records.filter(r => calculateDaysLeft(r.dob) === 0);
-      if (todayRecords.length === 0) {
-        container.innerHTML = `
-          <div class="col-span-1 md:col-span-2 glass-card rounded-2xl p-6 text-center text-slate-400 text-xs">
-            <i class="fa-solid fa-umbrella-beach text-amber-400 text-2xl mb-2 block"></i>
-            No birthdays scheduled for today. Check upcoming celebrations below!
-          </div>`;
-        return;
-      }
-      container.innerHTML = todayRecords.map(r => `
-        <div class="stamp-card rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div class="flex items-center space-x-4">
-            <div class="relative">
-              <div class="w-14 h-14 rounded-full bg-gradient-to-tr from-amber-400 to-orange-500 flex items-center justify-center font-bold text-slate-950 text-lg shadow-md">
-                ${r.name.substring(0, 2).toUpperCase()}
-              </div>
-              <span class="absolute -bottom-1 -right-1 bg-amber-400 text-slate-950 text-[10px] font-extrabold px-1.5 py-0.5 rounded-full uppercase">Stamp</span>
-            </div>
-            <div>
-              <h3 class="font-serif font-bold text-white text-base">${r.name}</h3>
-              <p class="text-xs text-slate-400">${r.email}</p>
-              <div class="flex items-center space-x-2 mt-1">
-                <span class="text-[11px] font-semibold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20">${r.category}</span>
-                <span class="text-[11px] text-slate-400">DOB: ${formatDateDisplay(r.dob)}</span>
-              </div>
-            </div>
-          </div>
-          <div class="flex sm:flex-col gap-2 w-full sm:w-auto">
-            <button onclick="openInviteDrawer('${r.id}')" class="flex-1 sm:flex-none px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs shadow-glow-gold transition">
-              <i class="fa-solid fa-paper-plane mr-1"></i> SEND WISH
-            </button>
-          </div>
+      // Aaj ki birthdays
+      const todayList = withDays.filter(r => r.days === 0);
+      const alertBox = document.getElementById('todayAlert');
+      alertBox.classList.toggle('hidden', todayList.length === 0);
+      document.getElementById('todayCards').innerHTML = todayList.map(r => `
+        <div class="bg-slate-950/60 border border-amber-500/30 p-4 rounded-xl">
+          <strong class="text-white block font-semibold">${escapeHtml(r.name)}</strong>
+          <span class="text-xs text-amber-400 block mb-2">${escapeHtml(r.category)}</span>
+          <button onclick="openInviteDrawer(${r.id})" class="bg-white text-slate-950 text-xs px-3 py-1.5 rounded-lg font-bold hover:bg-amber-300 transition cursor-pointer">Send Invite</button>
         </div>
       `).join('');
+
+      // Table
+      const filtered = withDays
+        .filter(r => (r.name + r.email + r.category).toLowerCase().includes(query))
+        .sort((a, b) => a.days - b.days);
+
+      document.getElementById('tableBody').innerHTML = filtered.map(r => `
+        <tr class="hover:bg-slate-900/40 transition">
+          <td class="py-3.5 font-medium text-white">${escapeHtml(r.name)}</td>
+          <td class="py-3.5 text-slate-300">${escapeHtml(r.email)}</td>
+          <td class="py-3.5 text-slate-300">${escapeHtml(r.category)}</td>
+          <td class="py-3.5 text-slate-300">${formatBirthday(r.date)}</td>
+          <td class="py-3.5 font-semibold ${r.days === 0 ? 'text-amber-400' : 'text-slate-300'}">${r.days === 0 ? '🎉 Today' : r.days + ' days'}</td>
+          <td class="py-3.5">
+            <button onclick="openInviteDrawer(${r.id})" class="bg-slate-800 hover:bg-slate-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold mr-2 transition cursor-pointer">Invite</button>
+            <button onclick="deleteRecord(${r.id})" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer">Delete</button>
+          </td>
+        </tr>
+      `).join('');
+
+      document.getElementById('emptyMsg').classList.toggle('hidden', filtered.length !== 0);
     }
 
-    function renderTable(records) {
-      const tbody = document.getElementById('recordsTableBody');
-      const emptyState = document.getElementById('emptyState');
-      const searchVal = document.getElementById('searchInput').value.toLowerCase().trim();
+    // ================= Add / Delete =================
+    document.getElementById('birthdayForm').addEventListener('submit', function (e) {
+      e.preventDefault();
 
-      let filtered = records.filter(r => {
-        const matchesSearch = r.name.toLowerCase().includes(searchVal) || r.email.toLowerCase().includes(searchVal) || (r.category && r.category.toLowerCase().includes(searchVal));
-        const daysLeft = calculateDaysLeft(r.dob);
-        if (!matchesSearch) return false;
-        if (currentCategoryFilter === 'TODAY') return daysLeft === 0;
-        if (currentCategoryFilter === 'UPCOMING') return daysLeft > 0 && daysLeft <= 7;
-        return true;
-      });
-
-      if (filtered.length === 0) {
-        tbody.innerHTML = '';
-        emptyState.classList.remove('hidden');
-        return;
-      }
-      emptyState.classList.add('hidden');
-
-      tbody.innerHTML = filtered.map(r => {
-        const daysLeft = calculateDaysLeft(r.dob);
-        let daysBadge = '';
-        if (daysLeft === 0) {
-          daysBadge = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-amber-400 text-slate-950 animate-pulse shadow-glow-gold"><i class="fa-solid fa-cake-candles mr-1"></i> Today!</span>`;
-        } else if (daysLeft <= 7) {
-          daysBadge = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-sky-500/20 text-sky-300 border border-sky-500/30">${daysLeft} days</span>`;
-        } else {
-          daysBadge = `<span class="text-xs text-slate-400 font-mono">${daysLeft} days</span>`;
-        }
-        return `
-          <tr class="hover:bg-slate-800/40 transition group">
-            <td class="py-3.5 px-4 font-semibold text-white flex items-center space-x-3">
-              <div class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xs text-amber-400 font-bold">${r.name.substring(0, 2).toUpperCase()}</div>
-              <span>${r.name}</span>
-            </td>
-            <td class="py-3.5 px-4 text-slate-400 text-xs">${r.email}</td>
-            <td class="py-3.5 px-4"><span class="px-2 py-0.5 rounded text-[11px] font-medium bg-slate-800 text-slate-300 border border-slate-700">${r.category}</span></td>
-            <td class="py-3.5 px-4 text-xs font-mono font-bold text-amber-300">PKR ${getRecordAmount(r).toLocaleString()}</td>
-            <td class="py-3.5 px-4 text-xs font-mono text-slate-300">${formatDateDisplay(r.dob)}</td>
-            <td class="py-3.5 px-4">${daysBadge}</td>
-            <td class="py-3.5 px-4 text-right space-x-1.5">
-              <button onclick="openInviteDrawer('${r.id}')" class="px-2.5 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs font-semibold transition" title="Generate Wish Letter & Voucher">
-                <i class="fa-solid fa-paper-plane mr-1"></i> SEND WISH
-              </button>
-              <button onclick="editRecord('${r.id}')" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition" title="Edit Record"><i class="fa-solid fa-pen text-xs"></i></button>
-              <button onclick="deleteRecord('${r.id}')" class="p-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 transition" title="Delete Record"><i class="fa-solid fa-trash text-xs"></i></button>
-            </td>
-          </tr>
-        `;
-      }).join('');
-    }
-
-    function filterRecords() { renderApp(); }
-
-    function setFilterCategory(cat) {
-      currentCategoryFilter = cat;
-      document.querySelectorAll('.filter-tab').forEach(btn => {
-        btn.classList.remove('bg-amber-500', 'text-slate-950', 'font-semibold');
-        btn.classList.add('text-slate-400');
-      });
-      const activeBtn = document.getElementById(`filterBtn${cat}`);
-      if (activeBtn) {
-        activeBtn.classList.add('bg-amber-500', 'text-slate-950', 'font-semibold');
-        activeBtn.classList.remove('text-slate-400');
-      }
-      renderApp();
-    }
-
-    function handleFormSubmit(event) {
-      event.preventDefault();
-      const name = document.getElementById('inputName').value.trim();
-      const email = document.getElementById('inputEmail').value.trim();
-      const dob = document.getElementById('inputDob').value;
-      const category = document.getElementById('inputCategory').value;
-      const amount = parseInt(document.getElementById('inputAmount').value, 10) || 0;
-      let records = getStoredRecords();
-      if (currentEditingId) {
-        records = records.map(r => r.id === currentEditingId ? { id: r.id, name, email, dob, category, amount } : r);
-        showNotification('Voyager record updated successfully!', 'success');
-      } else {
-        records.push({ id: Date.now().toString(), name, email, dob, category, amount });
-        showNotification('New Voyager registered to ledger!', 'success');
-      }
-      saveStoredRecords(records);
-      resetForm();
-    }
-
-    function editRecord(id) {
       const records = getStoredRecords();
-      const r = records.find(item => item.id === id);
-      if (!r) return;
-      currentEditingId = id;
-      document.getElementById('inputName').value = r.name;
-      document.getElementById('inputEmail').value = r.email;
-      document.getElementById('inputDob').value = r.dob;
-      document.getElementById('inputCategory').value = r.category;
-      document.getElementById('inputAmount').value = getRecordAmount(r);
-      document.getElementById('formTitle').innerText = 'Edit Voyager Record';
-      document.getElementById('submitBtn').innerHTML = `<i class="fa-solid fa-check mr-1.5"></i> Update Record`;
-      scrollToForm();
-    }
+      records.push({
+        id: Date.now(),
+        name: document.getElementById('nameInput').value.trim(),
+        email: document.getElementById('emailInput').value.trim(),
+        category: document.getElementById('categoryInput').value.trim(),
+        date: document.getElementById('dateInput').value
+      });
+      saveRecords(records);
+
+      this.reset();
+      renderAll();
+    });
 
     function deleteRecord(id) {
-      if (confirm('Are you sure you want to remove this record from the ledger?')) {
-        let records = getStoredRecords();
-        records = records.filter(r => r.id !== id);
-        saveStoredRecords(records);
-        showNotification('Record removed from ledger', 'info');
-      }
+      if (!confirm('Is client ko delete karna hai?')) return;
+      saveRecords(getStoredRecords().filter(item => item.id !== id));
+      renderAll();
     }
 
-    function resetForm() {
-      currentEditingId = null;
-      document.getElementById('addVoyagerForm').reset();
-      document.getElementById('inputAmount').value = 5000;
-      document.getElementById('formTitle').innerText = 'Add New Voyager Record';
-      document.getElementById('submitBtn').innerHTML = `<i class="fa-solid fa-floppy-disk mr-1.5"></i> Save Record`;
-    }
+    document.getElementById('searchInput').addEventListener('input', renderAll);
 
-    function scrollToForm() { document.getElementById('addFormSection').scrollIntoView({ behavior: 'smooth' }); }
-
+    // ================= Invite Drawer =================
     function openInviteDrawer(id) {
       const records = getStoredRecords();
       const r = records.find(item => item.id === id);
       if (!r) return;
 
-      const amount = getRecordAmount(r);
-      const amountDisplay = `PKR ${amount.toLocaleString()}`;
+      const safeName = escapeHtml(r.name);
+      const safeCategory = escapeHtml(r.category);
 
       document.getElementById('drawerRecipientName').innerText = r.name;
       document.getElementById('drawerRecipientEmail').innerText = r.email;
       document.getElementById('drawerAvatar').innerText = r.name.substring(0, 2).toUpperCase();
 
       const voucherCode = `CV-BDAY-${r.name.replace(/\s+/g, '').toUpperCase()}-2026`;
-      currentVoucherCode = voucherCode;
+      document.getElementById('drawerVoucherCode').innerText = voucherCode;
 
-      const liveInvitationUrl = `${INVITATION_BASE_URL}?name=${encodeURIComponent(r.name)}`;
-      document.getElementById('drawerInvitationBtn').href = liveInvitationUrl;
+      const liveInvitationUrl = `https://glowing-tarsier-6e7668.netlify.app/?code=${voucherCode}`;
+      document.getElementById('drawerShareLink').value = liveInvitationUrl;
 
-      // Voucher page link (naam aur amount ke sath)
-      const voucherUrl = `${VOUCHER_BASE_URL}?name=${encodeURIComponent(r.name)}&amount=${amount}`;
-      currentVoucherUrl = voucherUrl;
-      document.getElementById('drawerVoucherLinkBtn').href = voucherUrl;
-
-      // Fill the landscape birthday voucher (this exact node is exported as the voucher image)
-      document.getElementById('voucherFullName').innerText = r.name;
-      document.getElementById('voucherFullAmount').innerText = `${amountDisplay}/-`;
-      document.getElementById('voucherFullValidity').innerText = 'Till your next customize plan';
-      document.getElementById('voucherFullId').innerText = `ID: ${voucherCode}`;
-
-      const qrContainer = document.getElementById('voucherQrCode');
-      qrContainer.innerHTML = '';
-      if (typeof QRCode === 'function') {
-        new QRCode(qrContainer, { text: liveInvitationUrl, width: 104, height: 104, colorDark: '#151233', colorLight: '#ffffff' });
-      }
+      const voucherUrl = `https://lighthearted-rugelach-b971a6.netlify.app/?name=${encodeURIComponent(r.name)}&amount=5000`;
+      window.currentVoucherUrl = voucherUrl;
 
       document.getElementById('drawerLetterPreview').innerHTML = `
-        <p>Dear <strong class="text-amber-400">${r.name}</strong>,</p>
+        <p>Dear <strong class="text-amber-400">${safeName}</strong>,</p>
         <p>Warmest wishes from Cultural Voyagers on your special day!</p>
-        <p>As a valued <strong>${r.category}</strong>, we are delighted to present you with an exclusive <strong>${amountDisplay} Luxury Travel Voucher</strong> for your next journey.</p>
+        <p>As a valued <strong>${safeCategory}</strong>, we are delighted to present you with an exclusive <strong>PKR 5,000 Luxury Travel Voucher</strong> for your next journey.</p>
         <p class="text-slate-400 italic">"May your upcoming year be filled with unforgettable destinations and rich experiences."</p>
       `;
 
       const subject = encodeURIComponent(`A Birthday Journey Awaits - Cultural Voyagers! 🎉`);
-      const bodyText =
-`Dear ${r.name},
+      const bodyText = `Dear ${r.name},\n\nWarmest wishes from Cultural Voyagers on your special day!\n\nWe have designed an exclusive personalized birthday experience for you:\n${liveInvitationUrl}\n\nYour Birthday Voucher:\n${voucherUrl}\n\nYour Voucher Code: ${voucherCode}\n(Valid for PKR 5,000 credit on any international voyage booking)\n\n"May your upcoming year be filled with unforgettable destinations and rich experiences."\n\nBest regards,\nCultural Voyagers Team`;
 
-Warmest wishes from Cultural Voyagers on your special day! 🎉
-
-🔗 View Your Birthday Invitation:
-${liveInvitationUrl}
-
-🎁 Your Exclusive ${amountDisplay} Birthday Voucher (open to view or save as PDF):
-${voucherUrl}
-Voucher Code: ${voucherCode}
-
-"May your upcoming year be filled with unforgettable destinations and rich experiences."
-
-Best regards,
-Cultural Voyagers Team`;
-
-      currentGmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(r.email)}&su=${subject}&body=${encodeURIComponent(bodyText)}&authuser=${encodeURIComponent(SENDER_GMAIL_ACCOUNT)}`;
+      window.currentGmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(r.email)}&su=${subject}&body=${encodeURIComponent(bodyText)}`;
 
       const overlay = document.getElementById('drawerOverlay');
       const container = document.getElementById('drawerContainer');
       overlay.classList.remove('hidden');
-      setTimeout(() => { container.classList.remove('translate-x-full'); }, 10);
+      setTimeout(() => container.classList.remove('translate-x-full'), 10);
     }
 
-    // Renders the off-screen voucher card into an actual PDF using jsPDF + html2canvas.
-    // Calls back with the jsPDF document instance once ready.
-    function generateVoucherPDF(callback) {
-      const node = document.getElementById('voucherFullCapture');
-      if (typeof html2canvas !== 'function' || typeof window.jspdf === 'undefined') {
-        showNotification('PDF generator failed to load. Check your connection.', 'info');
-        return;
-      }
-      const { jsPDF } = window.jspdf;
-      html2canvas(node, { backgroundColor: '#f4f5f7', scale: 2, useCORS: true }).then(canvas => {
-        const imgData = canvas.toDataURL('image/png');
-        const pdf = new jsPDF({ orientation: 'landscape', unit: 'px', format: [canvas.width, canvas.height] });
-        pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
-        callback(pdf);
-      }).catch(() => {
-        showNotification('Could not generate the voucher PDF.', 'info');
-      });
-    }
-
-    // Gmail compose window opens directly with the invitation link and the voucher link
-    // already inside the email body — nothing to attach manually.
-    function sendViaGmail() {
-      if (!currentGmailUrl) {
-        showNotification('Open a "Send Wish" drawer first.', 'info');
-        return;
-      }
-      window.open(currentGmailUrl, '_blank');
-      showNotification('Gmail opened — voucher link email mein shamil hai.', 'success');
-    }
-
-    // Opens the voucher PDF in a new tab to preview and downloads it (optional extra).
-    function viewAndDownloadVoucher() {
-      showNotification('Preparing your voucher PDF…', 'info');
-      generateVoucherPDF(pdf => {
-        const name = (document.getElementById('drawerRecipientName').innerText || 'Voyager').replace(/\s+/g, '_');
-        window.open(pdf.output('bloburl'), '_blank');
-        pdf.save(`Voucher_${name}.pdf`);
-        showNotification('Voucher PDF opened & downloaded.', 'success');
-      });
-    }
-
-    function copyVoucherCode() {
-      if (!currentVoucherCode) {
-        showNotification('Open a "Send Wish" drawer first.', 'info');
-        return;
-      }
-      navigator.clipboard.writeText(currentVoucherCode).then(() => {
-        showNotification('Voucher Code Copied!', 'success');
-      });
-    }
-
-    function closeDrawer() {
-      const container = document.getElementById('drawerContainer');
+    function closeInviteDrawer() {
       const overlay = document.getElementById('drawerOverlay');
+      const container = document.getElementById('drawerContainer');
       container.classList.add('translate-x-full');
-      setTimeout(() => { overlay.classList.add('hidden'); }, 300);
+      setTimeout(() => overlay.classList.add('hidden'), 300);
     }
 
-    function copyToClipboard(elementId, successMsg) {
-      const elem = document.getElementById(elementId);
-      const textToCopy = elem.value || elem.innerText;
-      navigator.clipboard.writeText(textToCopy).then(() => { showNotification(successMsg, 'success'); });
+    function sendViaGmail() {
+      if (window.currentGmailUrl) window.open(window.currentGmailUrl, '_blank');
     }
 
-    function showNotification(message, type = 'success') {
-      const toast = document.getElementById('toastNotification');
-      const msgElem = document.getElementById('toastMessage');
-      const iconElem = document.getElementById('toastIcon');
-      msgElem.innerText = message;
-      iconElem.innerHTML = type === 'success'
-        ? `<i class="fa-solid fa-circle-check text-emerald-400 text-base"></i>`
-        : `<i class="fa-solid fa-circle-info text-amber-400 text-base"></i>`;
-      toast.classList.remove('translate-y-20', 'opacity-0');
-      toast.classList.add('translate-y-0', 'opacity-100');
-      setTimeout(() => {
-        toast.classList.remove('translate-y-0', 'opacity-100');
-        toast.classList.add('translate-y-20', 'opacity-0');
-      }, 3000);
+    function viewVoucher() {
+      if (window.currentVoucherUrl) window.open(window.currentVoucherUrl, '_blank');
     }
 
-    function triggerConfetti() {
-      if (typeof confetti === 'function') {
-        confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
-      }
+    function copyInviteLink() {
+      const input = document.getElementById('drawerShareLink');
+      navigator.clipboard.writeText(input.value).then(() => {
+        const btn = document.getElementById('copyBtn');
+        btn.innerText = 'Copied!';
+        setTimeout(() => (btn.innerText = 'Copy'), 1500);
+      });
     }
 
-    function triggerLogoAnimation() {
-      triggerConfetti();
-      showNotification('Cultural Voyagers Registry Active', 'info');
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      renderApp();
-    });
+    // ================= Start =================
+    renderAll();
   </script>
 </body>
 </html>
