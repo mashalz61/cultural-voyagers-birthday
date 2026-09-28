@@ -84,6 +84,61 @@
       50% { transform: translateY(-6px) rotate(1deg); }
     }
     .floating-logo { animation: float 6s ease-in-out infinite; }
+
+    /* Page entrance: sections fade up one after another */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    main > section { animation: fadeUp 0.7s ease both; }
+    main > section:nth-child(1) { animation-delay: 0.05s; }
+    main > section:nth-child(2) { animation-delay: 0.2s; }
+    main > section:nth-child(3) { animation-delay: 0.35s; }
+    main > section:nth-child(4) { animation-delay: 0.5s; }
+
+    /* Table rows and today's cards */
+    @keyframes rowIn {
+      from { opacity: 0; transform: translateX(-10px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    #recordsTableBody tr { animation: rowIn 0.35s ease both; }
+    #todaySpotlightGrid > * { animation: fadeUp 0.6s ease both; }
+
+    /* Cards lift on hover */
+    .glass-card, .stamp-card { transition: transform 0.25s ease, box-shadow 0.25s ease; }
+    .stamp-card:hover { transform: translateY(-4px) scale(1.01); box-shadow: 0 12px 30px -8px rgba(245,158,11,0.35); }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; transition: none !important; }
+    }
+
+    /* Mobile fixes */
+    @media (max-width: 640px) {
+      table { min-width: 820px; }
+      main { padding-left: 12px; padding-right: 12px; }
+      #todaySpotlightGrid .stamp-card { padding: 16px; }
+    }
+
+    /* Button press animation */
+    button, label[title="Import CSV"], a[target="_blank"] {
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.15s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    }
+    button:active, label[title="Import CSV"]:active, a[target="_blank"]:active {
+      transform: scale(0.94);
+    }
+    .ripple-dot {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.45);
+      transform: scale(0);
+      animation: rippleOut 0.6s ease-out forwards;
+      pointer-events: none;
+    }
+    @keyframes rippleOut {
+      to { transform: scale(4); opacity: 0; }
+    }
   </style>
 </head>
 
@@ -100,7 +155,7 @@
             <div class="relative w-14 h-14 rounded-full overflow-hidden border-2 border-amber-400/80 shadow-glow-logo floating-logo bg-slate-900 flex items-center justify-center shrink-0">
               <img
                 id="brandLogo"
-                src="logo.png"
+                src="logo.jpg"
                 alt="Cultural Voyagers Logo"
                 class="w-full h-full object-cover"
                 onerror="this.style.display='none'; document.getElementById('logoFallback').classList.remove('hidden');"
@@ -390,9 +445,13 @@
               class="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-sky-500/10 hover:bg-sky-500/20 text-sky-300 border border-sky-500/30 text-xs font-semibold transition">
               <i class="fa-solid fa-envelope-open-text"></i> View Your Birthday Invitation
             </a>
+            <a id="drawerVoucherLinkBtn" href="#" target="_blank"
+              class="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-semibold transition">
+              <i class="fa-solid fa-gift"></i> Open Birthday Voucher Page
+            </a>
             <button onclick="viewAndDownloadVoucher()"
               class="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-semibold transition">
-              <i class="fa-solid fa-file-pdf"></i> View / Download Voucher (PDF)
+              <i class="fa-solid fa-file-pdf"></i> Open Voucher to Save PDF
             </button>
           </div>
 
@@ -461,7 +520,7 @@
 
       <div class="pt-6 border-t border-slate-800 space-y-2">
         <p class="text-[10px] text-slate-500 text-center leading-relaxed">
-          Gmail can't auto-attach files. Clicking "Send Wish" below downloads the voucher for you — attach it with 📎 in the Gmail window that opens.
+          The invitation and voucher links are included in the email automatically. Just review and press Send in Gmail.
         </p>
         <button onclick="sendViaGmail()"
           class="w-full py-3 rounded-xl bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-300 hover:to-blue-400 text-slate-950 font-bold text-xs uppercase tracking-wider shadow-glow-gold transition flex items-center justify-center gap-2">
@@ -486,14 +545,21 @@
 
   <script>
     const INVITATION_BASE_URL = 'https://glowing-tarsier-6e7668.netlify.app/';
+    const VOUCHER_BASE_URL = 'https://lighthearted-rugelach-b971a6.netlify.app/';
     const SENDER_GMAIL_ACCOUNT = 'mashalzahra161@gmail.com';
 
-    const INITIAL_VOYAGERS = [];
-    const DEFAULT_SAMPLE_IDS = ['1', '2', '3', '4', '5'];
+    const INITIAL_VOYAGERS = [
+      { id: '1', name: 'Sanober K.', email: 'sanoberk@gmail.com', dob: getTodayFormatted(0), category: 'VIP Client', amount: 5000 },
+      { id: '2', name: 'Omar R.', email: 'omarr@gmail.com', dob: getTodayFormatted(0), category: 'VIP Client', amount: 7500 },
+      { id: '3', name: 'Nadhir A.', email: 'nadh@gmail.com', dob: getTodayFormatted(3), category: 'Family', amount: 3000 },
+      { id: '4', name: 'Darxin M.', email: 'darxiin@gmail.com', dob: getTodayFormatted(6), category: 'Staff', amount: 4000 },
+      { id: '5', name: 'Nimra S.', email: 'nim@gmail.com', dob: '1995-11-14', category: 'Travel Partner', amount: 5000 },
+    ];
 
     let currentCategoryFilter = 'ALL';
     let currentEditingId = null;
     let currentGmailUrl = null;
+    let currentVoucherUrl = '';
     let currentVoucherCode = '';
 
     function getTodayFormatted(offsetDays = 0) {
@@ -513,15 +579,6 @@
 
     function getStoredRecords() {
       const stored = localStorage.getItem('cultural_voyagers_ledger');
-      // One-time cleanup: remove the old built-in sample voyagers, keep real ones
-      if (stored && !localStorage.getItem('cv_samples_removed')) {
-        try {
-          const cleaned = JSON.parse(stored).filter(r => !DEFAULT_SAMPLE_IDS.includes(r.id));
-          localStorage.setItem('cultural_voyagers_ledger', JSON.stringify(cleaned));
-        } catch (e) {}
-        localStorage.setItem('cv_samples_removed', '1');
-        return getStoredRecords();
-      }
       if (!stored) {
         localStorage.setItem('cultural_voyagers_ledger', JSON.stringify(INITIAL_VOYAGERS));
         return INITIAL_VOYAGERS;
@@ -531,30 +588,7 @@
 
     function saveStoredRecords(records) {
       localStorage.setItem('cultural_voyagers_ledger', JSON.stringify(records));
-      idbSave(JSON.stringify(records));
       renderApp();
-    }
-
-    // ── Second copy of the data in IndexedDB (auto-restores if localStorage gets wiped) ──
-    function idbOpen() {
-      return new Promise((resolve, reject) => {
-        try {
-          const req = indexedDB.open('cv_ledger_db', 1);
-          req.onupgradeneeded = () => req.result.createObjectStore('kv');
-          req.onsuccess = () => resolve(req.result);
-          req.onerror = () => reject(req.error);
-        } catch (e) { reject(e); }
-      });
-    }
-    function idbSave(json) {
-      idbOpen().then(db => { db.transaction('kv', 'readwrite').objectStore('kv').put(json, 'ledger'); }).catch(() => {});
-    }
-    function idbLoad() {
-      return idbOpen().then(db => new Promise(resolve => {
-        const r = db.transaction('kv').objectStore('kv').get('ledger');
-        r.onsuccess = () => resolve(r.result || null);
-        r.onerror = () => resolve(null);
-      })).catch(() => null);
     }
 
     // Each voyager carries their own voucher amount now (set in the Add/Edit form),
@@ -647,9 +681,25 @@
       const total = records.length;
       const todayCount = records.filter(r => calculateDaysLeft(r.dob) === 0).length;
       const upcomingCount = records.filter(r => { const d = calculateDaysLeft(r.dob); return d > 0 && d <= 7; }).length;
-      document.getElementById('kpiTotalCount').innerText = total;
-      document.getElementById('kpiTodayCount').innerText = todayCount;
-      document.getElementById('kpiUpcomingCount').innerText = upcomingCount;
+      animateCount('kpiTotalCount', total);
+      animateCount('kpiTodayCount', todayCount);
+      animateCount('kpiUpcomingCount', upcomingCount);
+    }
+
+    // Numbers count up smoothly whenever they change
+    function animateCount(id, to) {
+      const el = document.getElementById(id);
+      const from = parseInt(el.dataset.val || '0', 10);
+      el.dataset.val = to;
+      if (from === to) { el.innerText = to; return; }
+      const start = performance.now();
+      const duration = 700;
+      function step(now) {
+        const p = Math.min((now - start) / duration, 1);
+        el.innerText = Math.round(from + (to - from) * p);
+        if (p < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
     }
 
     function renderTodaySpotlight(records) {
@@ -774,6 +824,7 @@
       } else {
         records.push({ id: Date.now().toString(), name, email, dob, category, amount });
         showNotification('New Voyager registered to ledger!', 'success');
+        triggerConfetti();
       }
       saveStoredRecords(records);
       resetForm();
@@ -831,6 +882,11 @@
       const liveInvitationUrl = `${INVITATION_BASE_URL}?name=${encodeURIComponent(r.name)}`;
       document.getElementById('drawerInvitationBtn').href = liveInvitationUrl;
 
+      // Voucher page link (naam aur amount ke sath)
+      const voucherUrl = `${VOUCHER_BASE_URL}?name=${encodeURIComponent(r.name)}&amount=${amount}`;
+      currentVoucherUrl = voucherUrl;
+      document.getElementById('drawerVoucherLinkBtn').href = voucherUrl;
+
       // Fill the landscape birthday voucher (this exact node is exported as the voucher image)
       document.getElementById('voucherFullName').innerText = r.name;
       document.getElementById('voucherFullAmount').innerText = `${amountDisplay}/-`;
@@ -859,7 +915,8 @@ Warmest wishes from Cultural Voyagers on your special day! 🎉
 🔗 View Your Birthday Invitation:
 ${liveInvitationUrl}
 
-🎁 Your Exclusive ${amountDisplay} Birthday Voucher is attached to this email — open the attachment to view and redeem it.
+🎁 Your Exclusive ${amountDisplay} Birthday Voucher (open to view or save as PDF):
+${voucherUrl}
 Voucher Code: ${voucherCode}
 
 "May your upcoming year be filled with unforgettable destinations and rich experiences."
@@ -894,33 +951,26 @@ Cultural Voyagers Team`;
       });
     }
 
+    // Gmail compose window opens directly with the invitation link and the voucher link
+    // already inside the email body — nothing to attach manually.
     function sendViaGmail() {
       if (!currentGmailUrl) {
         showNotification('Open a "Send Wish" drawer first.', 'info');
         return;
       }
-      // Auto-download the voucher PDF first so it's ready in Downloads, then open Gmail.
-      // Browsers/Gmail block any site from attaching a file automatically for
-      // security reasons — this just removes the need for a separate manual step.
-      showNotification('Preparing the voucher PDF…', 'info');
-      generateVoucherPDF(pdf => {
-        const name = (document.getElementById('drawerRecipientName').innerText || 'Voyager').replace(/\s+/g, '_');
-        pdf.save(`Voucher_${name}.pdf`);
-        window.open(currentGmailUrl, '_blank');
-        showNotification('Voucher PDF downloaded! In Gmail, click 📎 and attach it before sending.', 'success');
-      });
+      window.open(currentGmailUrl, '_blank');
+      showNotification('Gmail opened — voucher link email mein shamil hai.', 'success');
     }
 
-    // Opens the voucher PDF in a new tab to preview, and downloads it for attaching
-    // to the email — since Gmail's compose link can't attach files automatically.
+    // Opens the same voucher page that goes in the email, so the voucher
+    // (and the PDF saved from it) is always identical.
     function viewAndDownloadVoucher() {
-      showNotification('Preparing your voucher PDF…', 'info');
-      generateVoucherPDF(pdf => {
-        const name = (document.getElementById('drawerRecipientName').innerText || 'Voyager').replace(/\s+/g, '_');
-        window.open(pdf.output('bloburl'), '_blank');
-        pdf.save(`Voucher_${name}.pdf`);
-        showNotification('Voucher PDF opened & downloaded — attach it in the Gmail draft.', 'success');
-      });
+      if (!currentVoucherUrl) {
+        showNotification('Open a "Send Wish" drawer first.', 'info');
+        return;
+      }
+      window.open(currentVoucherUrl, '_blank');
+      showNotification('Voucher page opened — "Print / Save Voucher PDF" dabao.', 'info');
     }
 
     function copyVoucherCode() {
@@ -973,21 +1023,25 @@ Cultural Voyagers Team`;
       showNotification('Cultural Voyagers Registry Active', 'info');
     }
 
-    document.addEventListener('DOMContentLoaded', async () => {
-      // Ask the browser not to auto-delete this site's data
-      try { if (navigator.storage && navigator.storage.persist) await navigator.storage.persist(); } catch (e) {}
-      // If localStorage was cleared but the IndexedDB copy survived, restore it
-      const local = localStorage.getItem('cultural_voyagers_ledger');
-      if (!local || local === '[]') {
-        const backup = await idbLoad();
-        if (backup && backup !== '[]') {
-          localStorage.setItem('cultural_voyagers_ledger', backup);
-          localStorage.setItem('cv_samples_removed', '1');
-        }
-      } else {
-        idbSave(local);
-      }
+    // Ripple effect on every button / link press
+    document.addEventListener('click', (e) => {
+      const target = e.target.closest('button, a[target="_blank"], label[title="Import CSV"]');
+      if (!target) return;
+      const rect = target.getBoundingClientRect();
+      const size = Math.max(rect.width, rect.height);
+      const dot = document.createElement('span');
+      dot.className = 'ripple-dot';
+      dot.style.width = dot.style.height = size + 'px';
+      dot.style.left = (e.clientX - rect.left - size / 2) + 'px';
+      dot.style.top = (e.clientY - rect.top - size / 2) + 'px';
+      target.appendChild(dot);
+      setTimeout(() => dot.remove(), 600);
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
       renderApp();
+      const hasBirthdayToday = getStoredRecords().some(r => calculateDaysLeft(r.dob) === 0);
+      if (hasBirthdayToday) setTimeout(triggerConfetti, 900);
     });
   </script>
 </body>
