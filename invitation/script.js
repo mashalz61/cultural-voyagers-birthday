@@ -30,7 +30,18 @@ function getClientName() {
   return "Voyager";
 }
 
+// Extract voucher amount from URL query parameter (e.g., ?name=Umair&amount=10000)
+function getVoucherAmount() {
+  const amount = parseInt(new URLSearchParams(window.location.search).get('amount'), 10);
+  return isNaN(amount) || amount < 0 ? 5000 : amount;
+}
+
 document.addEventListener("DOMContentLoaded", () => {
+  // Set voucher amount everywhere it appears
+  document.querySelectorAll(".voucher-amount").forEach(el => {
+    el.textContent = getVoucherAmount().toLocaleString("en-US");
+  });
+
   // Set Client Name
   const clientNameElement = document.getElementById("clientName");
   if (clientNameElement) {
