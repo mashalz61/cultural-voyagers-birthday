@@ -1,72 +1,252 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cultural Voyagers Portal</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            color: #fff;
-        }
-        .container {
-            text-align: center;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 40px;
-            border-radius: 15px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-        }
-        h1 {
-            margin-bottom: 20px;
-            font-size: 2.5rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-        p {
-            margin-bottom: 30px;
-            font-size: 1.1rem;
-            color: #f0f0f0;
-        }
-        .links {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        a {
-            text-decoration: none;
-            background: #ff758c;
-            background: linear-gradient(to right, #ff758c, #ff7eb3);
-            color: white;
-            padding: 12px 25px;
-            border-radius: 25px;
-            font-weight: bold;
-            font-size: 1.1rem;
-            transition: transform 0.2s, box-shadow 0.2s;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-        a:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cultural Voyagers | Portal</title>
+  <meta name="description" content="Cultural Voyagers internal operations portal">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #070b19;
+      --card: rgba(255, 255, 255, 0.04);
+      --gold: #e2b15e;
+      --gold-bright: #f5c56b;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --border: rgba(226, 177, 94, 0.22);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(ellipse at 20% 0%, rgba(226, 177, 94, 0.14), transparent 55%),
+        radial-gradient(ellipse at 90% 100%, rgba(56, 100, 200, 0.18), transparent 50%),
+        var(--bg);
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 18px;
+      overflow-x: hidden;
+    }
+
+    .portal {
+      width: 100%;
+      max-width: 880px;
+      text-align: center;
+      animation: rise 0.8s cubic-bezier(.2,.8,.2,1) both;
+    }
+
+    /* Brand */
+    .logo {
+      width: 92px; height: 92px;
+      margin: 0 auto 20px;
+      border-radius: 50%;
+      padding: 3px;
+      background: linear-gradient(135deg, var(--gold-bright), #c4953c);
+      box-shadow: 0 0 40px rgba(226, 177, 94, 0.35);
+      animation: float 6s ease-in-out infinite;
+    }
+    .logo img, .logo span {
+      width: 100%; height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #0b1129;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Cinzel', serif; font-weight: 700; font-size: 1.6rem; color: var(--gold);
+    }
+    .eyebrow {
+      display: inline-block;
+      font-size: 0.72rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      border: 1px solid var(--border);
+      background: rgba(226, 177, 94, 0.06);
+      padding: 6px 16px;
+      border-radius: 50px;
+      margin-bottom: 16px;
+    }
+    h1 {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(1.9rem, 6vw, 3rem);
+      font-weight: 700;
+      line-height: 1.2;
+      background: linear-gradient(135deg, #ffffff, var(--gold));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 12px;
+    }
+    .subtitle {
+      color: var(--muted);
+      font-size: 1rem;
+      font-weight: 300;
+      margin-bottom: 40px;
+    }
+
+    /* Module cards */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+    .card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text);
+      background: var(--card);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 18px;
+      padding: 30px 20px 24px;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      overflow: hidden;
+      transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+      animation: rise 0.8s cubic-bezier(.2,.8,.2,1) both;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .card:nth-child(1) { animation-delay: 0.15s; }
+    .card:nth-child(2) { animation-delay: 0.3s; }
+    .card:nth-child(3) { animation-delay: 0.45s; }
+    .card::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(circle at 50% 0%, rgba(226, 177, 94, 0.18), transparent 65%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .icon {
+      position: relative;
+      width: 58px; height: 58px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.7rem;
+      border-radius: 16px;
+      background: rgba(226, 177, 94, 0.1);
+      border: 1px solid var(--border);
+    }
+    .card h2 {
+      position: relative;
+      font-family: 'Cinzel', serif;
+      font-size: 1.15rem;
+      font-weight: 600;
+    }
+    .card p {
+      position: relative;
+      font-size: 0.85rem;
+      line-height: 1.55;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .open {
+      position: relative;
+      margin-top: auto;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+    .open span { display: inline-block; transition: transform 0.3s ease; }
+
+    @media (hover: hover) {
+      .card:hover {
+        transform: translateY(-8px);
+        border-color: var(--gold);
+        box-shadow: 0 20px 45px -12px rgba(226, 177, 94, 0.35);
+      }
+      .card:hover::before { opacity: 1; }
+      .card:hover .open span { transform: translateX(6px); }
+    }
+    .card:active { transform: scale(0.97); }
+    .card:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+
+    .footer-note {
+      margin-top: 40px;
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #64748b;
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+
+    @media (max-width: 720px) {
+      .grid { grid-template-columns: 1fr; gap: 14px; }
+      .card {
+        flex-direction: row;
+        text-align: left;
+        align-items: center;
+        gap: 16px;
+        padding: 18px;
+      }
+      .card > div.text { flex: 1; }
+      .card p { margin-bottom: 0; }
+      .open { margin-top: 6px; display: inline-block; }
+      .subtitle { margin-bottom: 28px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; transition: none !important; }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🌟 Cultural Voyagers 🌟</h1>
-        <p>Explore our projects and portals below:</p>
-        <div class="links">
-            <a href="dashboard/">📊 Dashboard</a>
-            <a href="invitation/">💌 Invitation</a>
-            <a href="birthdayVoucher/">🎁 Birthday Voucher</a>
-        </div>
+  <main class="portal">
+    <div class="logo">
+      <img src="logo.jpg" alt="Cultural Voyagers logo"
+           onerror="this.outerHTML='<span>CV</span>'">
     </div>
+    <span class="eyebrow">Internal Portal</span>
+    <h1>Cultural Voyagers</h1>
+    <p class="subtitle">Choose a module to continue</p>
+
+    <div class="grid">
+      <a href="dashboard/" class="card">
+        <div class="icon">📊</div>
+        <div class="text">
+          <h2>Dashboard</h2>
+          <p>Manage voyager records, track birthdays and send wishes.</p>
+          <span class="open">Open <span>→</span></span>
+        </div>
+      </a>
+
+      <a href="invitation/" class="card">
+        <div class="icon">💌</div>
+        <div class="text">
+          <h2>Invitation</h2>
+          <p>Preview the personalized birthday invitation experience.</p>
+          <span class="open">Open <span>→</span></span>
+        </div>
+      </a>
+
+      <a href="birthdayVoucher/" class="card">
+        <div class="icon">🎁</div>
+        <div class="text">
+          <h2>Birthday Voucher</h2>
+          <p>View and save the exclusive birthday travel voucher.</p>
+          <span class="open">Open <span>→</span></span>
+        </div>
+      </a>
+    </div>
+
+    <p class="footer-note">© 2026 Cultural Voyagers · Internal Operations Portal</p>
+  </main>
 </body>
 </html>
