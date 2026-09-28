@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cultural Voyagers Portal</title>
+</head>
+<body>
+    <h1>Welcome to Cultural Voyagers</h1>
+    <ul>
+        <li><a href="dashboard/">Dashboard</a></li>
+        <li><a href="invitation/">Invitation</a></li>
+        <li><a href="birthdayVoucher/">Birthday Voucher</a></li>
+    </ul>
+</body>
+</html>
