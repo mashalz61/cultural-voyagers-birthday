@@ -84,54 +84,6 @@
       50% { transform: translateY(-6px) rotate(1deg); }
     }
     .floating-logo { animation: float 6s ease-in-out infinite; }
-
-    /* Page entrance: sections fade up one after another */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(18px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    main > section { animation: fadeUp 0.7s ease both; }
-    main > section:nth-child(1) { animation-delay: 0.05s; }
-    main > section:nth-child(2) { animation-delay: 0.2s; }
-    main > section:nth-child(3) { animation-delay: 0.35s; }
-    main > section:nth-child(4) { animation-delay: 0.5s; }
-
-    /* Table rows and today's cards */
-    @keyframes rowIn {
-      from { opacity: 0; transform: translateX(-10px); }
-      to   { opacity: 1; transform: translateX(0); }
-    }
-    #recordsTableBody tr { animation: rowIn 0.35s ease both; }
-    #todaySpotlightGrid > * { animation: fadeUp 0.6s ease both; }
-
-    /* Cards lift on hover */
-    .glass-card, .stamp-card { transition: transform 0.25s ease, box-shadow 0.25s ease; }
-    .stamp-card:hover { transform: translateY(-4px) scale(1.01); box-shadow: 0 12px 30px -8px rgba(245,158,11,0.35); }
-
-    @media (prefers-reduced-motion: reduce) {
-      * { animation: none !important; transition: none !important; }
-    }
-
-    /* Button press animation */
-    button, label[title="Import CSV"], a[target="_blank"] {
-      position: relative;
-      overflow: hidden;
-      transition: transform 0.15s ease, box-shadow 0.2s ease, background-color 0.2s ease;
-    }
-    button:active, label[title="Import CSV"]:active, a[target="_blank"]:active {
-      transform: scale(0.94);
-    }
-    .ripple-dot {
-      position: absolute;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.45);
-      transform: scale(0);
-      animation: rippleOut 0.6s ease-out forwards;
-      pointer-events: none;
-    }
-    @keyframes rippleOut {
-      to { transform: scale(4); opacity: 0; }
-    }
   </style>
 </head>
 
@@ -148,7 +100,7 @@
             <div class="relative w-14 h-14 rounded-full overflow-hidden border-2 border-amber-400/80 shadow-glow-logo floating-logo bg-slate-900 flex items-center justify-center shrink-0">
               <img
                 id="brandLogo"
-                src="logo.jpg"
+                src="logo.png"
                 alt="Cultural Voyagers Logo"
                 class="w-full h-full object-cover"
                 onerror="this.style.display='none'; document.getElementById('logoFallback').classList.remove('hidden');"
@@ -173,18 +125,11 @@
             <i class="fa-solid fa-plus mr-2 font-bold"></i> Add Voyager
           </button>
           <button
-            onclick="syncNow()"
+            onclick="showNotification('Database synchronized with local storage', 'info')"
             class="p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white transition border border-slate-700/60"
-            title="Sync Ledger with GitHub"
+            title="Sync Ledger"
           >
             <i class="fa-solid fa-arrows-rotate text-sm"></i>
-          </button>
-          <button
-            onclick="openSettings()"
-            class="p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white transition border border-slate-700/60"
-            title="GitHub Settings"
-          >
-            <i class="fa-brands fa-github text-sm"></i>
           </button>
         </div>
 
@@ -441,17 +386,13 @@
 
           <div class="space-y-2">
             <label class="text-xs font-semibold text-slate-300 uppercase tracking-wide">Quick Links</label>
-            <a id="drawerInvitationBtn" href="#" target="_blank" rel="noopener"
+            <a id="drawerInvitationBtn" href="#" target="_blank"
               class="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-sky-500/10 hover:bg-sky-500/20 text-sky-300 border border-sky-500/30 text-xs font-semibold transition">
               <i class="fa-solid fa-envelope-open-text"></i> View Your Birthday Invitation
             </a>
-            <a id="drawerVoucherLinkBtn" href="#" target="_blank" rel="noopener"
-              class="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-semibold transition">
-              <i class="fa-solid fa-gift"></i> Open Birthday Voucher Page
-            </a>
             <button onclick="viewAndDownloadVoucher()"
               class="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-semibold transition">
-              <i class="fa-solid fa-file-pdf"></i> Open Voucher to Save PDF
+              <i class="fa-solid fa-file-pdf"></i> View / Download Voucher (PDF)
             </button>
           </div>
 
@@ -520,7 +461,7 @@
 
       <div class="pt-6 border-t border-slate-800 space-y-2">
         <p class="text-[10px] text-slate-500 text-center leading-relaxed">
-          The invitation and voucher links are included in the email automatically. Just review and press Send in Gmail.
+          Gmail can't auto-attach files. Clicking "Send Wish" below downloads the voucher for you — attach it with 📎 in the Gmail window that opens.
         </p>
         <button onclick="sendViaGmail()"
           class="w-full py-3 rounded-xl bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-300 hover:to-blue-400 text-slate-950 font-bold text-xs uppercase tracking-wider shadow-glow-gold transition flex items-center justify-center gap-2">
@@ -535,44 +476,6 @@
     </div>
   </div>
 
-  <!-- GitHub Settings Modal -->
-  <div id="settingsOverlay" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4" onclick="closeSettings()">
-    <div class="bg-[#0b1329] border border-slate-800 rounded-2xl p-6 w-full max-w-md space-y-4 shadow-2xl max-h-full overflow-y-auto" onclick="event.stopPropagation()">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <h3 class="font-serif font-bold text-lg text-white"><i class="fa-brands fa-github mr-2 text-amber-400"></i>GitHub Auto-Save</h3>
-        <button onclick="closeSettings()" class="text-slate-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
-      </div>
-      <p class="text-[11px] text-slate-400 leading-relaxed">Har entry save/edit/delete par <code class="text-amber-300">data.json</code> khud aapke GitHub repo mein update ho jayegi. Ye settings sirf is browser mein save hoti hain.</p>
-      <div class="space-y-1.5">
-        <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wide" for="ghOwner">GitHub Username</label>
-        <input id="ghOwner" type="text" autocomplete="off" class="w-full bg-slate-900 border border-slate-700/80 rounded-xl px-4 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-amber-500 transition">
-      </div>
-      <div class="space-y-1.5">
-        <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wide" for="ghRepo">Repository Name</label>
-        <input id="ghRepo" type="text" autocomplete="off" class="w-full bg-slate-900 border border-slate-700/80 rounded-xl px-4 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-amber-500 transition">
-      </div>
-      <div class="grid grid-cols-2 gap-3">
-        <div class="space-y-1.5">
-          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wide" for="ghBranch">Branch</label>
-          <input id="ghBranch" type="text" autocomplete="off" placeholder="main" class="w-full bg-slate-900 border border-slate-700/80 rounded-xl px-4 py-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500 transition">
-        </div>
-        <div class="space-y-1.5">
-          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wide" for="ghPath">Data File</label>
-          <input id="ghPath" type="text" autocomplete="off" placeholder="data.json" class="w-full bg-slate-900 border border-slate-700/80 rounded-xl px-4 py-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500 transition">
-        </div>
-      </div>
-      <div class="space-y-1.5">
-        <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wide" for="ghToken">Personal Access Token</label>
-        <input id="ghToken" type="password" autocomplete="off" placeholder="github_pat_..." class="w-full bg-slate-900 border border-slate-700/80 rounded-xl px-4 py-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500 transition">
-        <p class="text-[11px] text-slate-500">GitHub → Settings → Developer settings → Fine-grained tokens. Sirf isi repo ka access aur <b>Contents: Read and write</b> permission dein.</p>
-      </div>
-      <div class="flex items-center justify-between pt-2 gap-3">
-        <button onclick="disconnectGitHub()" class="px-4 py-2.5 rounded-xl border border-red-500/30 text-red-400 hover:bg-red-500/10 text-xs font-semibold transition">Disconnect</button>
-        <button onclick="saveSettings()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-300 hover:to-orange-300 text-slate-950 font-semibold text-xs transition"><i class="fa-solid fa-plug mr-1.5"></i> Save & Connect</button>
-      </div>
-    </div>
-  </div>
-
   <!-- Notification Toast -->
   <div id="toastNotification" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
     <div class="bg-slate-900 border border-amber-500/50 text-slate-100 px-4 py-3 rounded-xl shadow-2xl flex items-center space-x-3">
@@ -583,39 +486,15 @@
 
   <script>
     const INVITATION_BASE_URL = 'https://glowing-tarsier-6e7668.netlify.app/';
-    const VOUCHER_BASE_URL = 'https://lighthearted-rugelach-b971a6.netlify.app/';
     const SENDER_GMAIL_ACCOUNT = 'mashalzahra161@gmail.com';
 
-    const INITIAL_VOYAGERS = [
-      { id: '1', name: 'Sanober K.', email: 'sanoberk@gmail.com', dob: getTodayFormatted(0), category: 'VIP Client', amount: 5000 },
-      { id: '2', name: 'Omar R.', email: 'omarr@gmail.com', dob: getTodayFormatted(0), category: 'VIP Client', amount: 7500 },
-      { id: '3', name: 'Nadhir A.', email: 'nadh@gmail.com', dob: getTodayFormatted(3), category: 'Family', amount: 3000 },
-      { id: '4', name: 'Darxin M.', email: 'darxiin@gmail.com', dob: getTodayFormatted(6), category: 'Staff', amount: 4000 },
-      { id: '5', name: 'Nimra S.', email: 'nim@gmail.com', dob: '1995-11-14', category: 'Travel Partner', amount: 5000 },
-    ];
+    const INITIAL_VOYAGERS = [];
+    const DEFAULT_SAMPLE_IDS = ['1', '2', '3', '4', '5'];
 
     let currentCategoryFilter = 'ALL';
     let currentEditingId = null;
     let currentGmailUrl = null;
-    let currentVoucherUrl = '';
     let currentVoucherCode = '';
-
-    // Escapes user-provided text before it is placed inside innerHTML
-    function escapeHtml(str) {
-      return String(str == null ? '' : str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-    }
-
-    // Parses "YYYY-MM-DD" as a LOCAL date (new Date("YYYY-MM-DD") is UTC and can shift the day)
-    function parseDob(dobString) {
-      const parts = String(dobString || '').split('-').map(Number);
-      if (parts.length < 3 || parts.some(isNaN)) return null;
-      return new Date(parts[0], parts[1] - 1, parts[2]);
-    }
 
     function getTodayFormatted(offsetDays = 0) {
       const today = new Date();
@@ -627,34 +506,55 @@
     }
 
     function formatDateDisplay(dobString) {
-      const date = parseDob(dobString);
-      if (!date) return '';
+      if (!dobString) return '';
+      const date = new Date(dobString);
       return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     }
 
     function getStoredRecords() {
-      try {
-        const stored = localStorage.getItem('cultural_voyagers_ledger');
-        if (!stored) {
-          localStorage.setItem('cultural_voyagers_ledger', JSON.stringify(INITIAL_VOYAGERS));
-          return INITIAL_VOYAGERS.slice();
-        }
-        const parsed = JSON.parse(stored);
-        return Array.isArray(parsed) ? parsed : INITIAL_VOYAGERS.slice();
-      } catch (e) {
-        return INITIAL_VOYAGERS.slice();
+      const stored = localStorage.getItem('cultural_voyagers_ledger');
+      // One-time cleanup: remove the old built-in sample voyagers, keep real ones
+      if (stored && !localStorage.getItem('cv_samples_removed')) {
+        try {
+          const cleaned = JSON.parse(stored).filter(r => !DEFAULT_SAMPLE_IDS.includes(r.id));
+          localStorage.setItem('cultural_voyagers_ledger', JSON.stringify(cleaned));
+        } catch (e) {}
+        localStorage.setItem('cv_samples_removed', '1');
+        return getStoredRecords();
       }
+      if (!stored) {
+        localStorage.setItem('cultural_voyagers_ledger', JSON.stringify(INITIAL_VOYAGERS));
+        return INITIAL_VOYAGERS;
+      }
+      try { return JSON.parse(stored); } catch (e) { return INITIAL_VOYAGERS; }
     }
 
     function saveStoredRecords(records) {
-      try {
-        localStorage.setItem('cultural_voyagers_ledger', JSON.stringify(records));
-        localStorage.setItem(GH_DIRTY_KEY, '1');
-      } catch (e) {
-        showNotification('Could not save to local storage.', 'info');
-      }
+      localStorage.setItem('cultural_voyagers_ledger', JSON.stringify(records));
+      idbSave(JSON.stringify(records));
       renderApp();
-      pushToGitHub();
+    }
+
+    // ── Second copy of the data in IndexedDB (auto-restores if localStorage gets wiped) ──
+    function idbOpen() {
+      return new Promise((resolve, reject) => {
+        try {
+          const req = indexedDB.open('cv_ledger_db', 1);
+          req.onupgradeneeded = () => req.result.createObjectStore('kv');
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
+        } catch (e) { reject(e); }
+      });
+    }
+    function idbSave(json) {
+      idbOpen().then(db => { db.transaction('kv', 'readwrite').objectStore('kv').put(json, 'ledger'); }).catch(() => {});
+    }
+    function idbLoad() {
+      return idbOpen().then(db => new Promise(resolve => {
+        const r = db.transaction('kv').objectStore('kv').get('ledger');
+        r.onsuccess = () => resolve(r.result || null);
+        r.onerror = () => resolve(null);
+      })).catch(() => null);
     }
 
     // Each voyager carries their own voucher amount now (set in the Add/Edit form),
@@ -666,16 +566,16 @@
     }
 
     function calculateDaysLeft(dobString) {
-      const dob = parseDob(dobString);
-      if (!dob) return 999;
+      if (!dobString) return 999;
       const today = new Date();
       today.setHours(0, 0, 0, 0);
+      const dob = new Date(dobString);
       const currentYear = today.getFullYear();
       let nextBday = new Date(currentYear, dob.getMonth(), dob.getDate());
       nextBday.setHours(0, 0, 0, 0);
-      if (nextBday < today) nextBday = new Date(currentYear + 1, dob.getMonth(), dob.getDate());
+      if (nextBday < today) nextBday.setFullYear(currentYear + 1);
       const diffTime = nextBday - today;
-      return Math.round(diffTime / (1000 * 60 * 60 * 24));
+      return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     }
 
     function exportToExcel() {
@@ -688,12 +588,12 @@
       csvContent += "ID,Full Name,Email Address,Date of Birth,Category,Voucher Amount (PKR),Days Until Birthday\n";
       records.forEach(r => {
         const daysLeft = calculateDaysLeft(r.dob);
-        const nameEscaped = `"${String(r.name || '').replace(/"/g, '""')}"`;
-        const emailEscaped = `"${String(r.email || '').replace(/"/g, '""')}"`;
-        const categoryEscaped = `"${String(r.category || '').replace(/"/g, '""')}"`;
+        const nameEscaped = `"${r.name.replace(/"/g, '""')}"`;
+        const emailEscaped = `"${r.email.replace(/"/g, '""')}"`;
+        const categoryEscaped = `"${r.category.replace(/"/g, '""')}"`;
         csvContent += `${r.id},${nameEscaped},${emailEscaped},${r.dob},${categoryEscaped},${getRecordAmount(r)},${daysLeft}\n`;
       });
-      const encodedUri = encodeURI(csvContent).replace(/#/g, '%23');
+      const encodedUri = encodeURI(csvContent);
       const link = document.createElement("a");
       link.setAttribute("href", encodedUri);
       link.setAttribute("download", `Cultural_Voyagers_Birthdays_${getTodayFormatted(0)}.csv`);
@@ -703,50 +603,26 @@
       showNotification('Excel sheet downloaded successfully!', 'success');
     }
 
-    // Splits one CSV line into columns, respecting "quoted, values"
-    function parseCSVLine(line) {
-      const cols = [];
-      let cur = '';
-      let inQuotes = false;
-      for (let i = 0; i < line.length; i++) {
-        const ch = line[i];
-        if (inQuotes) {
-          if (ch === '"' && line[i + 1] === '"') { cur += '"'; i++; }
-          else if (ch === '"') { inQuotes = false; }
-          else { cur += ch; }
-        } else if (ch === '"') {
-          inQuotes = true;
-        } else if (ch === ',') {
-          cols.push(cur.trim());
-          cur = '';
-        } else {
-          cur += ch;
-        }
-      }
-      cols.push(cur.trim());
-      return cols;
-    }
-
     function importCSV(event) {
       const file = event.target.files[0];
       if (!file) return;
       const reader = new FileReader();
       reader.onload = function(e) {
-        const text = String(e.target.result || '').replace(/^\uFEFF/, '');
-        const lines = text.split(/\r?\n/);
+        const text = e.target.result;
+        const lines = text.split('\n');
         let addedCount = 0;
         let records = getStoredRecords();
         for (let i = 1; i < lines.length; i++) {
           const line = lines[i].trim();
           if (!line) continue;
-          const cols = parseCSVLine(line);
+          const cols = line.split(',').map(c => c.replace(/^"|"$/g, '').trim());
           if (cols.length >= 4) {
             const name = cols[1] || cols[0];
             const email = cols[2] || cols[1];
             const dob = cols[3] || cols[2];
             const category = cols[4] || 'VIP Client';
             const amount = parseInt(cols[5], 10) || 5000;
-            if (name && dob && parseDob(dob)) {
+            if (name && dob) {
               records.push({ id: Date.now().toString() + Math.random().toString(36).substr(2, 4), name, email, dob, category, amount });
               addedCount++;
             }
@@ -771,25 +647,9 @@
       const total = records.length;
       const todayCount = records.filter(r => calculateDaysLeft(r.dob) === 0).length;
       const upcomingCount = records.filter(r => { const d = calculateDaysLeft(r.dob); return d > 0 && d <= 7; }).length;
-      animateCount('kpiTotalCount', total);
-      animateCount('kpiTodayCount', todayCount);
-      animateCount('kpiUpcomingCount', upcomingCount);
-    }
-
-    // Numbers count up smoothly whenever they change
-    function animateCount(id, to) {
-      const el = document.getElementById(id);
-      const from = parseInt(el.dataset.val || '0', 10);
-      el.dataset.val = to;
-      if (from === to) { el.innerText = to; return; }
-      const start = performance.now();
-      const duration = 700;
-      function step(now) {
-        const p = Math.min((now - start) / duration, 1);
-        el.innerText = Math.round(from + (to - from) * p);
-        if (p < 1) requestAnimationFrame(step);
-      }
-      requestAnimationFrame(step);
+      document.getElementById('kpiTotalCount').innerText = total;
+      document.getElementById('kpiTodayCount').innerText = todayCount;
+      document.getElementById('kpiUpcomingCount').innerText = upcomingCount;
     }
 
     function renderTodaySpotlight(records) {
@@ -808,21 +668,21 @@
           <div class="flex items-center space-x-4">
             <div class="relative">
               <div class="w-14 h-14 rounded-full bg-gradient-to-tr from-amber-400 to-orange-500 flex items-center justify-center font-bold text-slate-950 text-lg shadow-md">
-                ${escapeHtml(String(r.name).substring(0, 2).toUpperCase())}
+                ${r.name.substring(0, 2).toUpperCase()}
               </div>
               <span class="absolute -bottom-1 -right-1 bg-amber-400 text-slate-950 text-[10px] font-extrabold px-1.5 py-0.5 rounded-full uppercase">Stamp</span>
             </div>
             <div>
-              <h3 class="font-serif font-bold text-white text-base">${escapeHtml(r.name)}</h3>
-              <p class="text-xs text-slate-400">${escapeHtml(r.email)}</p>
+              <h3 class="font-serif font-bold text-white text-base">${r.name}</h3>
+              <p class="text-xs text-slate-400">${r.email}</p>
               <div class="flex items-center space-x-2 mt-1">
-                <span class="text-[11px] font-semibold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20">${escapeHtml(r.category)}</span>
+                <span class="text-[11px] font-semibold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20">${r.category}</span>
                 <span class="text-[11px] text-slate-400">DOB: ${formatDateDisplay(r.dob)}</span>
               </div>
             </div>
           </div>
           <div class="flex sm:flex-col gap-2 w-full sm:w-auto">
-            <button onclick="openInviteDrawer('${escapeHtml(r.id)}')" class="flex-1 sm:flex-none px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs shadow-glow-gold transition">
+            <button onclick="openInviteDrawer('${r.id}')" class="flex-1 sm:flex-none px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs shadow-glow-gold transition">
               <i class="fa-solid fa-paper-plane mr-1"></i> SEND WISH
             </button>
           </div>
@@ -836,7 +696,7 @@
       const searchVal = document.getElementById('searchInput').value.toLowerCase().trim();
 
       let filtered = records.filter(r => {
-        const matchesSearch = String(r.name || '').toLowerCase().includes(searchVal) || String(r.email || '').toLowerCase().includes(searchVal) || (r.category && r.category.toLowerCase().includes(searchVal));
+        const matchesSearch = r.name.toLowerCase().includes(searchVal) || r.email.toLowerCase().includes(searchVal) || (r.category && r.category.toLowerCase().includes(searchVal));
         const daysLeft = calculateDaysLeft(r.dob);
         if (!matchesSearch) return false;
         if (currentCategoryFilter === 'TODAY') return daysLeft === 0;
@@ -861,26 +721,23 @@
         } else {
           daysBadge = `<span class="text-xs text-slate-400 font-mono">${daysLeft} days</span>`;
         }
-        const safeId = escapeHtml(r.id);
         return `
           <tr class="hover:bg-slate-800/40 transition group">
-            <td class="py-3.5 px-4 font-semibold text-white">
-              <div class="flex items-center space-x-3">
-                <div class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xs text-amber-400 font-bold">${escapeHtml(String(r.name).substring(0, 2).toUpperCase())}</div>
-                <span>${escapeHtml(r.name)}</span>
-              </div>
+            <td class="py-3.5 px-4 font-semibold text-white flex items-center space-x-3">
+              <div class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xs text-amber-400 font-bold">${r.name.substring(0, 2).toUpperCase()}</div>
+              <span>${r.name}</span>
             </td>
-            <td class="py-3.5 px-4 text-slate-400 text-xs">${escapeHtml(r.email)}</td>
-            <td class="py-3.5 px-4"><span class="px-2 py-0.5 rounded text-[11px] font-medium bg-slate-800 text-slate-300 border border-slate-700">${escapeHtml(r.category)}</span></td>
+            <td class="py-3.5 px-4 text-slate-400 text-xs">${r.email}</td>
+            <td class="py-3.5 px-4"><span class="px-2 py-0.5 rounded text-[11px] font-medium bg-slate-800 text-slate-300 border border-slate-700">${r.category}</span></td>
             <td class="py-3.5 px-4 text-xs font-mono font-bold text-amber-300">PKR ${getRecordAmount(r).toLocaleString()}</td>
             <td class="py-3.5 px-4 text-xs font-mono text-slate-300">${formatDateDisplay(r.dob)}</td>
             <td class="py-3.5 px-4">${daysBadge}</td>
             <td class="py-3.5 px-4 text-right space-x-1.5">
-              <button onclick="openInviteDrawer('${safeId}')" class="px-2.5 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs font-semibold transition" title="Generate Wish Letter & Voucher">
+              <button onclick="openInviteDrawer('${r.id}')" class="px-2.5 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs font-semibold transition" title="Generate Wish Letter & Voucher">
                 <i class="fa-solid fa-paper-plane mr-1"></i> SEND WISH
               </button>
-              <button onclick="editRecord('${safeId}')" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition" title="Edit Record"><i class="fa-solid fa-pen text-xs"></i></button>
-              <button onclick="deleteRecord('${safeId}')" class="p-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 transition" title="Delete Record"><i class="fa-solid fa-trash text-xs"></i></button>
+              <button onclick="editRecord('${r.id}')" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition" title="Edit Record"><i class="fa-solid fa-pen text-xs"></i></button>
+              <button onclick="deleteRecord('${r.id}')" class="p-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 transition" title="Delete Record"><i class="fa-solid fa-trash text-xs"></i></button>
             </td>
           </tr>
         `;
@@ -917,7 +774,6 @@
       } else {
         records.push({ id: Date.now().toString(), name, email, dob, category, amount });
         showNotification('New Voyager registered to ledger!', 'success');
-        triggerConfetti();
       }
       saveStoredRecords(records);
       resetForm();
@@ -925,9 +781,9 @@
 
     function editRecord(id) {
       const records = getStoredRecords();
-      const r = records.find(item => String(item.id) === String(id));
+      const r = records.find(item => item.id === id);
       if (!r) return;
-      currentEditingId = r.id;
+      currentEditingId = id;
       document.getElementById('inputName').value = r.name;
       document.getElementById('inputEmail').value = r.email;
       document.getElementById('inputDob').value = r.dob;
@@ -941,7 +797,7 @@
     function deleteRecord(id) {
       if (confirm('Are you sure you want to remove this record from the ledger?')) {
         let records = getStoredRecords();
-        records = records.filter(r => String(r.id) !== String(id));
+        records = records.filter(r => r.id !== id);
         saveStoredRecords(records);
         showNotification('Record removed from ledger', 'info');
       }
@@ -959,7 +815,7 @@
 
     function openInviteDrawer(id) {
       const records = getStoredRecords();
-      const r = records.find(item => String(item.id) === String(id));
+      const r = records.find(item => item.id === id);
       if (!r) return;
 
       const amount = getRecordAmount(r);
@@ -967,18 +823,13 @@
 
       document.getElementById('drawerRecipientName').innerText = r.name;
       document.getElementById('drawerRecipientEmail').innerText = r.email;
-      document.getElementById('drawerAvatar').innerText = String(r.name).substring(0, 2).toUpperCase();
+      document.getElementById('drawerAvatar').innerText = r.name.substring(0, 2).toUpperCase();
 
       const voucherCode = `CV-BDAY-${r.name.replace(/\s+/g, '').toUpperCase()}-2026`;
       currentVoucherCode = voucherCode;
 
       const liveInvitationUrl = `${INVITATION_BASE_URL}?name=${encodeURIComponent(r.name)}`;
       document.getElementById('drawerInvitationBtn').href = liveInvitationUrl;
-
-      // Voucher page link (naam aur amount ke sath)
-      const voucherUrl = `${VOUCHER_BASE_URL}?name=${encodeURIComponent(r.name)}&amount=${amount}`;
-      currentVoucherUrl = voucherUrl;
-      document.getElementById('drawerVoucherLinkBtn').href = voucherUrl;
 
       // Fill the landscape birthday voucher (this exact node is exported as the voucher image)
       document.getElementById('voucherFullName').innerText = r.name;
@@ -993,9 +844,9 @@
       }
 
       document.getElementById('drawerLetterPreview').innerHTML = `
-        <p>Dear <strong class="text-amber-400">${escapeHtml(r.name)}</strong>,</p>
+        <p>Dear <strong class="text-amber-400">${r.name}</strong>,</p>
         <p>Warmest wishes from Cultural Voyagers on your special day!</p>
-        <p>As a valued <strong>${escapeHtml(r.category)}</strong>, we are delighted to present you with an exclusive <strong>${amountDisplay} Luxury Travel Voucher</strong> for your next journey.</p>
+        <p>As a valued <strong>${r.category}</strong>, we are delighted to present you with an exclusive <strong>${amountDisplay} Luxury Travel Voucher</strong> for your next journey.</p>
         <p class="text-slate-400 italic">"May your upcoming year be filled with unforgettable destinations and rich experiences."</p>
       `;
 
@@ -1008,8 +859,7 @@ Warmest wishes from Cultural Voyagers on your special day! 🎉
 🔗 View Your Birthday Invitation:
 ${liveInvitationUrl}
 
-🎁 Your Exclusive ${amountDisplay} Birthday Voucher (open to view or save as PDF):
-${voucherUrl}
+🎁 Your Exclusive ${amountDisplay} Birthday Voucher is attached to this email — open the attachment to view and redeem it.
 Voucher Code: ${voucherCode}
 
 "May your upcoming year be filled with unforgettable destinations and rich experiences."
@@ -1044,26 +894,33 @@ Cultural Voyagers Team`;
       });
     }
 
-    // Gmail compose window opens directly with the invitation link and the voucher link
-    // already inside the email body — nothing to attach manually.
     function sendViaGmail() {
       if (!currentGmailUrl) {
         showNotification('Open a "Send Wish" drawer first.', 'info');
         return;
       }
-      window.open(currentGmailUrl, '_blank');
-      showNotification('Gmail opened — voucher link email mein shamil hai.', 'success');
+      // Auto-download the voucher PDF first so it's ready in Downloads, then open Gmail.
+      // Browsers/Gmail block any site from attaching a file automatically for
+      // security reasons — this just removes the need for a separate manual step.
+      showNotification('Preparing the voucher PDF…', 'info');
+      generateVoucherPDF(pdf => {
+        const name = (document.getElementById('drawerRecipientName').innerText || 'Voyager').replace(/\s+/g, '_');
+        pdf.save(`Voucher_${name}.pdf`);
+        window.open(currentGmailUrl, '_blank');
+        showNotification('Voucher PDF downloaded! In Gmail, click 📎 and attach it before sending.', 'success');
+      });
     }
 
-    // Opens the same voucher page that goes in the email, so the voucher
-    // (and the PDF saved from it) is always identical.
+    // Opens the voucher PDF in a new tab to preview, and downloads it for attaching
+    // to the email — since Gmail's compose link can't attach files automatically.
     function viewAndDownloadVoucher() {
-      if (!currentVoucherUrl) {
-        showNotification('Open a "Send Wish" drawer first.', 'info');
-        return;
-      }
-      window.open(currentVoucherUrl, '_blank');
-      showNotification('Voucher page opened — "Print / Save Voucher PDF" dabao.', 'info');
+      showNotification('Preparing your voucher PDF…', 'info');
+      generateVoucherPDF(pdf => {
+        const name = (document.getElementById('drawerRecipientName').innerText || 'Voyager').replace(/\s+/g, '_');
+        window.open(pdf.output('bloburl'), '_blank');
+        pdf.save(`Voucher_${name}.pdf`);
+        showNotification('Voucher PDF opened & downloaded — attach it in the Gmail draft.', 'success');
+      });
     }
 
     function copyVoucherCode() {
@@ -1073,8 +930,6 @@ Cultural Voyagers Team`;
       }
       navigator.clipboard.writeText(currentVoucherCode).then(() => {
         showNotification('Voucher Code Copied!', 'success');
-      }).catch(() => {
-        showNotification('Copy failed — please copy the code manually.', 'info');
       });
     }
 
@@ -1088,9 +943,7 @@ Cultural Voyagers Team`;
     function copyToClipboard(elementId, successMsg) {
       const elem = document.getElementById(elementId);
       const textToCopy = elem.value || elem.innerText;
-      navigator.clipboard.writeText(textToCopy).then(() => { showNotification(successMsg, 'success'); }).catch(() => {
-        showNotification('Copy failed.', 'info');
-      });
+      navigator.clipboard.writeText(textToCopy).then(() => { showNotification(successMsg, 'success'); });
     }
 
     function showNotification(message, type = 'success') {
@@ -1103,8 +956,7 @@ Cultural Voyagers Team`;
         : `<i class="fa-solid fa-circle-info text-amber-400 text-base"></i>`;
       toast.classList.remove('translate-y-20', 'opacity-0');
       toast.classList.add('translate-y-0', 'opacity-100');
-      clearTimeout(showNotification._t);
-      showNotification._t = setTimeout(() => {
+      setTimeout(() => {
         toast.classList.remove('translate-y-0', 'opacity-100');
         toast.classList.add('translate-y-20', 'opacity-0');
       }, 3000);
@@ -1121,176 +973,21 @@ Cultural Voyagers Team`;
       showNotification('Cultural Voyagers Registry Active', 'info');
     }
 
-    // Ripple effect on every button / link press
-    document.addEventListener('click', (e) => {
-      const target = e.target.closest('button, a[target="_blank"], label[title="Import CSV"]');
-      if (!target) return;
-      const rect = target.getBoundingClientRect();
-      const size = Math.max(rect.width, rect.height);
-      const dot = document.createElement('span');
-      dot.className = 'ripple-dot';
-      dot.style.width = dot.style.height = size + 'px';
-      dot.style.left = (e.clientX - rect.left - size / 2) + 'px';
-      dot.style.top = (e.clientY - rect.top - size / 2) + 'px';
-      target.appendChild(dot);
-      setTimeout(() => dot.remove(), 600);
-    });
-
-    // ===================== GitHub auto-save =====================
-    // Records live in data.json inside your GitHub repo. Every change is committed
-    // there automatically through the GitHub API; opening the page pulls the latest copy.
-    const GH_CFG_KEY = 'cv_github_cfg';
-    const GH_DIRTY_KEY = 'cv_github_dirty';
-    let ghSha = null;
-    let ghPushing = false;
-    let ghPushAgain = false;
-
-    function getGhCfg() {
-      try { return JSON.parse(localStorage.getItem(GH_CFG_KEY)) || {}; } catch (e) { return {}; }
-    }
-    function ghReady() {
-      const c = getGhCfg();
-      return !!(c.owner && c.repo && c.token);
-    }
-    function b64enc(str) { return btoa(unescape(encodeURIComponent(str))); }
-    function b64dec(str) { return decodeURIComponent(escape(atob(String(str).replace(/\s/g, '')))); }
-
-    function ghApi(method, body) {
-      const c = getGhCfg();
-      const path = (c.path || 'data.json').split('/').map(encodeURIComponent).join('/');
-      const branch = c.branch || 'main';
-      const url = `https://api.github.com/repos/${encodeURIComponent(c.owner)}/${encodeURIComponent(c.repo)}/contents/${path}`;
-      const opts = {
-        method,
-        cache: 'no-store',
-        headers: { 'Accept': 'application/vnd.github+json', 'Authorization': 'Bearer ' + c.token }
-      };
-      if (method === 'GET') return fetch(`${url}?ref=${encodeURIComponent(branch)}&t=${Date.now()}`, opts);
-      opts.headers['Content-Type'] = 'application/json';
-      opts.body = JSON.stringify(Object.assign({ branch }, body));
-      return fetch(url, opts);
-    }
-
-    function ghErrorMessage(status) {
-      if (status === 401) return 'GitHub token galat ya expire hai.';
-      if (status === 403) return 'GitHub ne access ya limit rok di (token permission check karein).';
-      if (status === 404) return 'Repo, branch ya token access nahi mila. Settings check karein.';
-      return 'GitHub sync fail hua (code ' + status + ').';
-    }
-
-    async function pullFromGitHub() {
-      if (!ghReady()) return false;
-      try {
-        const res = await ghApi('GET');
-        if (res.status === 404) {
-          // data.json does not exist yet: create it from the current local records
-          ghSha = null;
-          await pushToGitHub();
-          return true;
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Ask the browser not to auto-delete this site's data
+      try { if (navigator.storage && navigator.storage.persist) await navigator.storage.persist(); } catch (e) {}
+      // If localStorage was cleared but the IndexedDB copy survived, restore it
+      const local = localStorage.getItem('cultural_voyagers_ledger');
+      if (!local || local === '[]') {
+        const backup = await idbLoad();
+        if (backup && backup !== '[]') {
+          localStorage.setItem('cultural_voyagers_ledger', backup);
+          localStorage.setItem('cv_samples_removed', '1');
         }
-        if (!res.ok) { showNotification(ghErrorMessage(res.status), 'info'); return false; }
-        const j = await res.json();
-        ghSha = j.sha;
-        const arr = JSON.parse(b64dec(j.content));
-        if (Array.isArray(arr)) {
-          localStorage.setItem('cultural_voyagers_ledger', JSON.stringify(arr));
-          localStorage.removeItem(GH_DIRTY_KEY);
-          renderApp();
-        }
-        return true;
-      } catch (e) {
-        showNotification('GitHub se data load nahi hua. Internet check karein.', 'info');
-        return false;
+      } else {
+        idbSave(local);
       }
-    }
-
-    async function pushToGitHub(isRetry) {
-      if (!ghReady()) return;
-      if (ghPushing) { ghPushAgain = true; return; }
-      ghPushing = true;
-      try {
-        const body = {
-          message: 'Update ledger ' + new Date().toISOString(),
-          content: b64enc(JSON.stringify(getStoredRecords(), null, 2))
-        };
-        if (ghSha) body.sha = ghSha;
-        const res = await ghApi('PUT', body);
-        if ((res.status === 409 || res.status === 422) && !isRetry) {
-          // our copy of the file version is stale: fetch the latest version id and try once more
-          const g = await ghApi('GET');
-          ghSha = g.ok ? (await g.json()).sha : null;
-          ghPushing = false;
-          return await pushToGitHub(true);
-        }
-        if (!res.ok) { showNotification(ghErrorMessage(res.status), 'info'); return; }
-        const j = await res.json();
-        ghSha = j.content && j.content.sha;
-        localStorage.removeItem(GH_DIRTY_KEY);
-        showNotification('GitHub par save ho gaya ✔', 'success');
-      } catch (e) {
-        showNotification('GitHub par save nahi hua. Internet check karein.', 'info');
-      } finally {
-        ghPushing = false;
-        if (ghPushAgain) { ghPushAgain = false; pushToGitHub(); }
-      }
-    }
-
-    async function syncNow() {
-      if (!ghReady()) { openSettings(); return; }
-      if (localStorage.getItem(GH_DIRTY_KEY)) await pushToGitHub();
-      else if (await pullFromGitHub()) showNotification('GitHub se latest data aa gaya', 'success');
-    }
-
-    function openSettings() {
-      const c = getGhCfg();
-      document.getElementById('ghOwner').value = c.owner || '';
-      document.getElementById('ghRepo').value = c.repo || '';
-      document.getElementById('ghBranch').value = c.branch || '';
-      document.getElementById('ghPath').value = c.path || '';
-      document.getElementById('ghToken').value = c.token || '';
-      const o = document.getElementById('settingsOverlay');
-      o.classList.remove('hidden');
-      o.classList.add('flex');
-    }
-    function closeSettings() {
-      const o = document.getElementById('settingsOverlay');
-      o.classList.add('hidden');
-      o.classList.remove('flex');
-    }
-    async function saveSettings() {
-      const cfg = {
-        owner: document.getElementById('ghOwner').value.trim(),
-        repo: document.getElementById('ghRepo').value.trim(),
-        branch: document.getElementById('ghBranch').value.trim() || 'main',
-        path: document.getElementById('ghPath').value.trim() || 'data.json',
-        token: document.getElementById('ghToken').value.trim()
-      };
-      if (!cfg.owner || !cfg.repo || !cfg.token) {
-        showNotification('Username, repo aur token teeno zaroori hain.', 'info');
-        return;
-      }
-      localStorage.setItem(GH_CFG_KEY, JSON.stringify(cfg));
-      ghSha = null;
-      closeSettings();
-      showNotification('Connecting to GitHub...', 'info');
-      if (await pullFromGitHub()) showNotification('GitHub connected ✔', 'success');
-    }
-    function disconnectGitHub() {
-      localStorage.removeItem(GH_CFG_KEY);
-      ghSha = null;
-      closeSettings();
-      showNotification('GitHub disconnect ho gaya. Data is browser mein rahega.', 'info');
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
       renderApp();
-      const hasBirthdayToday = getStoredRecords().some(r => calculateDaysLeft(r.dob) === 0);
-      if (hasBirthdayToday) setTimeout(triggerConfetti, 900);
-      // Load the latest data from GitHub (or push unsynced local changes first)
-      if (ghReady()) {
-        if (localStorage.getItem(GH_DIRTY_KEY)) pushToGitHub();
-        else pullFromGitHub();
-      }
     });
   </script>
 </body>
