@@ -173,11 +173,18 @@
             <i class="fa-solid fa-plus mr-2 font-bold"></i> Add Voyager
           </button>
           <button
-            onclick="showNotification('Database synchronized with local storage', 'info')"
+            onclick="syncNow()"
             class="p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white transition border border-slate-700/60"
-            title="Sync Ledger"
+            title="Sync Ledger with GitHub"
           >
             <i class="fa-solid fa-arrows-rotate text-sm"></i>
+          </button>
+          <button
+            onclick="openSettings()"
+            class="p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white transition border border-slate-700/60"
+            title="GitHub Settings"
+          >
+            <i class="fa-brands fa-github text-sm"></i>
           </button>
         </div>
 
@@ -528,6 +535,44 @@
     </div>
   </div>
 
+  <!-- GitHub Settings Modal -->
+  <div id="settingsOverlay" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4" onclick="closeSettings()">
+    <div class="bg-[#0b1329] border border-slate-800 rounded-2xl p-6 w-full max-w-md space-y-4 shadow-2xl max-h-full overflow-y-auto" onclick="event.stopPropagation()">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="font-serif font-bold text-lg text-white"><i class="fa-brands fa-github mr-2 text-amber-400"></i>GitHub Auto-Save</h3>
+        <button onclick="closeSettings()" class="text-slate-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <p class="text-[11px] text-slate-400 leading-relaxed">Har entry save/edit/delete par <code class="text-amber-300">data.json</code> khud aapke GitHub repo mein update ho jayegi. Ye settings sirf is browser mein save hoti hain.</p>
+      <div class="space-y-1.5">
+        <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wide" for="ghOwner">GitHub Username</label>
+        <input id="ghOwner" type="text" autocomplete="off" class="w-full bg-slate-900 border border-slate-700/80 rounded-xl px-4 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-amber-500 transition">
+      </div>
+      <div class="space-y-1.5">
+        <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wide" for="ghRepo">Repository Name</label>
+        <input id="ghRepo" type="text" autocomplete="off" class="w-full bg-slate-900 border border-slate-700/80 rounded-xl px-4 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-amber-500 transition">
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div class="space-y-1.5">
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wide" for="ghBranch">Branch</label>
+          <input id="ghBranch" type="text" autocomplete="off" placeholder="main" class="w-full bg-slate-900 border border-slate-700/80 rounded-xl px-4 py-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500 transition">
+        </div>
+        <div class="space-y-1.5">
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wide" for="ghPath">Data File</label>
+          <input id="ghPath" type="text" autocomplete="off" placeholder="data.json" class="w-full bg-slate-900 border border-slate-700/80 rounded-xl px-4 py-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500 transition">
+        </div>
+      </div>
+      <div class="space-y-1.5">
+        <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wide" for="ghToken">Personal Access Token</label>
+        <input id="ghToken" type="password" autocomplete="off" placeholder="github_pat_..." class="w-full bg-slate-900 border border-slate-700/80 rounded-xl px-4 py-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500 transition">
+        <p class="text-[11px] text-slate-500">GitHub → Settings → Developer settings → Fine-grained tokens. Sirf isi repo ka access aur <b>Contents: Read and write</b> permission dein.</p>
+      </div>
+      <div class="flex items-center justify-between pt-2 gap-3">
+        <button onclick="disconnectGitHub()" class="px-4 py-2.5 rounded-xl border border-red-500/30 text-red-400 hover:bg-red-500/10 text-xs font-semibold transition">Disconnect</button>
+        <button onclick="saveSettings()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-300 hover:to-orange-300 text-slate-950 font-semibold text-xs transition"><i class="fa-solid fa-plug mr-1.5"></i> Save & Connect</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Notification Toast -->
   <div id="toastNotification" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
     <div class="bg-slate-900 border border-amber-500/50 text-slate-100 px-4 py-3 rounded-xl shadow-2xl flex items-center space-x-3">
@@ -604,10 +649,12 @@
     function saveStoredRecords(records) {
       try {
         localStorage.setItem('cultural_voyagers_ledger', JSON.stringify(records));
+        localStorage.setItem(GH_DIRTY_KEY, '1');
       } catch (e) {
         showNotification('Could not save to local storage.', 'info');
       }
       renderApp();
+      pushToGitHub();
     }
 
     // Each voyager carries their own voucher amount now (set in the Add/Edit form),
@@ -1089,10 +1136,161 @@ Cultural Voyagers Team`;
       setTimeout(() => dot.remove(), 600);
     });
 
+    // ===================== GitHub auto-save =====================
+    // Records live in data.json inside your GitHub repo. Every change is committed
+    // there automatically through the GitHub API; opening the page pulls the latest copy.
+    const GH_CFG_KEY = 'cv_github_cfg';
+    const GH_DIRTY_KEY = 'cv_github_dirty';
+    let ghSha = null;
+    let ghPushing = false;
+    let ghPushAgain = false;
+
+    function getGhCfg() {
+      try { return JSON.parse(localStorage.getItem(GH_CFG_KEY)) || {}; } catch (e) { return {}; }
+    }
+    function ghReady() {
+      const c = getGhCfg();
+      return !!(c.owner && c.repo && c.token);
+    }
+    function b64enc(str) { return btoa(unescape(encodeURIComponent(str))); }
+    function b64dec(str) { return decodeURIComponent(escape(atob(String(str).replace(/\s/g, '')))); }
+
+    function ghApi(method, body) {
+      const c = getGhCfg();
+      const path = (c.path || 'data.json').split('/').map(encodeURIComponent).join('/');
+      const branch = c.branch || 'main';
+      const url = `https://api.github.com/repos/${encodeURIComponent(c.owner)}/${encodeURIComponent(c.repo)}/contents/${path}`;
+      const opts = {
+        method,
+        cache: 'no-store',
+        headers: { 'Accept': 'application/vnd.github+json', 'Authorization': 'Bearer ' + c.token }
+      };
+      if (method === 'GET') return fetch(`${url}?ref=${encodeURIComponent(branch)}&t=${Date.now()}`, opts);
+      opts.headers['Content-Type'] = 'application/json';
+      opts.body = JSON.stringify(Object.assign({ branch }, body));
+      return fetch(url, opts);
+    }
+
+    function ghErrorMessage(status) {
+      if (status === 401) return 'GitHub token galat ya expire hai.';
+      if (status === 403) return 'GitHub ne access ya limit rok di (token permission check karein).';
+      if (status === 404) return 'Repo, branch ya token access nahi mila. Settings check karein.';
+      return 'GitHub sync fail hua (code ' + status + ').';
+    }
+
+    async function pullFromGitHub() {
+      if (!ghReady()) return false;
+      try {
+        const res = await ghApi('GET');
+        if (res.status === 404) {
+          // data.json does not exist yet: create it from the current local records
+          ghSha = null;
+          await pushToGitHub();
+          return true;
+        }
+        if (!res.ok) { showNotification(ghErrorMessage(res.status), 'info'); return false; }
+        const j = await res.json();
+        ghSha = j.sha;
+        const arr = JSON.parse(b64dec(j.content));
+        if (Array.isArray(arr)) {
+          localStorage.setItem('cultural_voyagers_ledger', JSON.stringify(arr));
+          localStorage.removeItem(GH_DIRTY_KEY);
+          renderApp();
+        }
+        return true;
+      } catch (e) {
+        showNotification('GitHub se data load nahi hua. Internet check karein.', 'info');
+        return false;
+      }
+    }
+
+    async function pushToGitHub(isRetry) {
+      if (!ghReady()) return;
+      if (ghPushing) { ghPushAgain = true; return; }
+      ghPushing = true;
+      try {
+        const body = {
+          message: 'Update ledger ' + new Date().toISOString(),
+          content: b64enc(JSON.stringify(getStoredRecords(), null, 2))
+        };
+        if (ghSha) body.sha = ghSha;
+        const res = await ghApi('PUT', body);
+        if ((res.status === 409 || res.status === 422) && !isRetry) {
+          // our copy of the file version is stale: fetch the latest version id and try once more
+          const g = await ghApi('GET');
+          ghSha = g.ok ? (await g.json()).sha : null;
+          ghPushing = false;
+          return await pushToGitHub(true);
+        }
+        if (!res.ok) { showNotification(ghErrorMessage(res.status), 'info'); return; }
+        const j = await res.json();
+        ghSha = j.content && j.content.sha;
+        localStorage.removeItem(GH_DIRTY_KEY);
+        showNotification('GitHub par save ho gaya ✔', 'success');
+      } catch (e) {
+        showNotification('GitHub par save nahi hua. Internet check karein.', 'info');
+      } finally {
+        ghPushing = false;
+        if (ghPushAgain) { ghPushAgain = false; pushToGitHub(); }
+      }
+    }
+
+    async function syncNow() {
+      if (!ghReady()) { openSettings(); return; }
+      if (localStorage.getItem(GH_DIRTY_KEY)) await pushToGitHub();
+      else if (await pullFromGitHub()) showNotification('GitHub se latest data aa gaya', 'success');
+    }
+
+    function openSettings() {
+      const c = getGhCfg();
+      document.getElementById('ghOwner').value = c.owner || '';
+      document.getElementById('ghRepo').value = c.repo || '';
+      document.getElementById('ghBranch').value = c.branch || '';
+      document.getElementById('ghPath').value = c.path || '';
+      document.getElementById('ghToken').value = c.token || '';
+      const o = document.getElementById('settingsOverlay');
+      o.classList.remove('hidden');
+      o.classList.add('flex');
+    }
+    function closeSettings() {
+      const o = document.getElementById('settingsOverlay');
+      o.classList.add('hidden');
+      o.classList.remove('flex');
+    }
+    async function saveSettings() {
+      const cfg = {
+        owner: document.getElementById('ghOwner').value.trim(),
+        repo: document.getElementById('ghRepo').value.trim(),
+        branch: document.getElementById('ghBranch').value.trim() || 'main',
+        path: document.getElementById('ghPath').value.trim() || 'data.json',
+        token: document.getElementById('ghToken').value.trim()
+      };
+      if (!cfg.owner || !cfg.repo || !cfg.token) {
+        showNotification('Username, repo aur token teeno zaroori hain.', 'info');
+        return;
+      }
+      localStorage.setItem(GH_CFG_KEY, JSON.stringify(cfg));
+      ghSha = null;
+      closeSettings();
+      showNotification('Connecting to GitHub...', 'info');
+      if (await pullFromGitHub()) showNotification('GitHub connected ✔', 'success');
+    }
+    function disconnectGitHub() {
+      localStorage.removeItem(GH_CFG_KEY);
+      ghSha = null;
+      closeSettings();
+      showNotification('GitHub disconnect ho gaya. Data is browser mein rahega.', 'info');
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
       renderApp();
       const hasBirthdayToday = getStoredRecords().some(r => calculateDaysLeft(r.dob) === 0);
       if (hasBirthdayToday) setTimeout(triggerConfetti, 900);
+      // Load the latest data from GitHub (or push unsynced local changes first)
+      if (ghReady()) {
+        if (localStorage.getItem(GH_DIRTY_KEY)) pushToGitHub();
+        else pullFromGitHub();
+      }
     });
   </script>
 </body>
