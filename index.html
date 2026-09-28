@@ -43,24 +43,42 @@
       animation: rise 0.8s cubic-bezier(.2,.8,.2,1) both;
     }
 
-    /* Brand */
+    /* Brand Logo Box - Perfectly Fitted */
     .logo {
-      width: 92px; height: 92px;
+      width: 100px; height: 100px;
       margin: 0 auto 20px;
       border-radius: 50%;
       padding: 3px;
       background: linear-gradient(135deg, var(--gold-bright), #c4953c);
       box-shadow: 0 0 40px rgba(226, 177, 94, 0.35);
       animation: float 6s ease-in-out infinite;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
     }
-    .logo img, .logo span {
+    .logo-inner {
       width: 100%; height: 100%;
       border-radius: 50%;
-      object-fit: cover;
       background: #0b1129;
-      display: flex; align-items: center; justify-content: center;
-      font-family: 'Cinzel', serif; font-weight: 700; font-size: 1.6rem; color: var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
     }
+    .logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover; /* Image ko box mein poora fit karne ke liye */
+      object-position: center;
+    }
+    .logo-text {
+      font-family: 'Cinzel', serif;
+      font-weight: 700;
+      font-size: 1.6rem;
+      color: var(--gold);
+    }
+
     .eyebrow {
       display: inline-block;
       font-size: 0.72rem;
@@ -210,8 +228,10 @@
 <body>
   <main class="portal">
     <div class="logo">
-      <img src="logo.jpg" alt="Cultural Voyagers logo"
-           onerror="this.outerHTML='<span>CV</span>'">
+      <div class="logo-inner">
+        <img src="image.jpg" alt="Cultural Voyagers logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+        <div class="logo-text" style="display:none;">CV</div>
+      </div>
     </div>
     <span class="eyebrow">Internal Portal</span>
     <h1>Cultural Voyagers</h1>
