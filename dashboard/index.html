@@ -111,6 +111,27 @@
     @media (prefers-reduced-motion: reduce) {
       * { animation: none !important; transition: none !important; }
     }
+
+    /* Button press animation */
+    button, label[title="Import CSV"], a[target="_blank"] {
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.15s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    }
+    button:active, label[title="Import CSV"]:active, a[target="_blank"]:active {
+      transform: scale(0.94);
+    }
+    .ripple-dot {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.45);
+      transform: scale(0);
+      animation: rippleOut 0.6s ease-out forwards;
+      pointer-events: none;
+    }
+    @keyframes rippleOut {
+      to { transform: scale(4); opacity: 0; }
+    }
   </style>
 </head>
 
@@ -413,11 +434,11 @@
 
           <div class="space-y-2">
             <label class="text-xs font-semibold text-slate-300 uppercase tracking-wide">Quick Links</label>
-            <a id="drawerInvitationBtn" href="#" target="_blank"
+            <a id="drawerInvitationBtn" href="#" target="_blank" rel="noopener"
               class="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-sky-500/10 hover:bg-sky-500/20 text-sky-300 border border-sky-500/30 text-xs font-semibold transition">
               <i class="fa-solid fa-envelope-open-text"></i> View Your Birthday Invitation
             </a>
-            <a id="drawerVoucherLinkBtn" href="#" target="_blank"
+            <a id="drawerVoucherLinkBtn" href="#" target="_blank" rel="noopener"
               class="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-semibold transition">
               <i class="fa-solid fa-gift"></i> Open Birthday Voucher Page
             </a>
@@ -534,6 +555,23 @@
     let currentVoucherUrl = '';
     let currentVoucherCode = '';
 
+    // Escapes user-provided text before it is placed inside innerHTML
+    function escapeHtml(str) {
+      return String(str == null ? '' : str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    // Parses "YYYY-MM-DD" as a LOCAL date (new Date("YYYY-MM-DD") is UTC and can shift the day)
+    function parseDob(dobString) {
+      const parts = String(dobString || '').split('-').map(Number);
+      if (parts.length < 3 || parts.some(isNaN)) return null;
+      return new Date(parts[0], parts[1] - 1, parts[2]);
+    }
+
     function getTodayFormatted(offsetDays = 0) {
       const today = new Date();
       today.setDate(today.getDate() + offsetDays);
@@ -544,22 +582,31 @@
     }
 
     function formatDateDisplay(dobString) {
-      if (!dobString) return '';
-      const date = new Date(dobString);
+      const date = parseDob(dobString);
+      if (!date) return '';
       return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     }
 
     function getStoredRecords() {
-      const stored = localStorage.getItem('cultural_voyagers_ledger');
-      if (!stored) {
-        localStorage.setItem('cultural_voyagers_ledger', JSON.stringify(INITIAL_VOYAGERS));
-        return INITIAL_VOYAGERS;
+      try {
+        const stored = localStorage.getItem('cultural_voyagers_ledger');
+        if (!stored) {
+          localStorage.setItem('cultural_voyagers_ledger', JSON.stringify(INITIAL_VOYAGERS));
+          return INITIAL_VOYAGERS.slice();
+        }
+        const parsed = JSON.parse(stored);
+        return Array.isArray(parsed) ? parsed : INITIAL_VOYAGERS.slice();
+      } catch (e) {
+        return INITIAL_VOYAGERS.slice();
       }
-      try { return JSON.parse(stored); } catch (e) { return INITIAL_VOYAGERS; }
     }
 
     function saveStoredRecords(records) {
-      localStorage.setItem('cultural_voyagers_ledger', JSON.stringify(records));
+      try {
+        localStorage.setItem('cultural_voyagers_ledger', JSON.stringify(records));
+      } catch (e) {
+        showNotification('Could not save to local storage.', 'info');
+      }
       renderApp();
     }
 
@@ -572,16 +619,16 @@
     }
 
     function calculateDaysLeft(dobString) {
-      if (!dobString) return 999;
+      const dob = parseDob(dobString);
+      if (!dob) return 999;
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      const dob = new Date(dobString);
       const currentYear = today.getFullYear();
       let nextBday = new Date(currentYear, dob.getMonth(), dob.getDate());
       nextBday.setHours(0, 0, 0, 0);
-      if (nextBday < today) nextBday.setFullYear(currentYear + 1);
+      if (nextBday < today) nextBday = new Date(currentYear + 1, dob.getMonth(), dob.getDate());
       const diffTime = nextBday - today;
-      return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      return Math.round(diffTime / (1000 * 60 * 60 * 24));
     }
 
     function exportToExcel() {
@@ -594,12 +641,12 @@
       csvContent += "ID,Full Name,Email Address,Date of Birth,Category,Voucher Amount (PKR),Days Until Birthday\n";
       records.forEach(r => {
         const daysLeft = calculateDaysLeft(r.dob);
-        const nameEscaped = `"${r.name.replace(/"/g, '""')}"`;
-        const emailEscaped = `"${r.email.replace(/"/g, '""')}"`;
-        const categoryEscaped = `"${r.category.replace(/"/g, '""')}"`;
+        const nameEscaped = `"${String(r.name || '').replace(/"/g, '""')}"`;
+        const emailEscaped = `"${String(r.email || '').replace(/"/g, '""')}"`;
+        const categoryEscaped = `"${String(r.category || '').replace(/"/g, '""')}"`;
         csvContent += `${r.id},${nameEscaped},${emailEscaped},${r.dob},${categoryEscaped},${getRecordAmount(r)},${daysLeft}\n`;
       });
-      const encodedUri = encodeURI(csvContent);
+      const encodedUri = encodeURI(csvContent).replace(/#/g, '%23');
       const link = document.createElement("a");
       link.setAttribute("href", encodedUri);
       link.setAttribute("download", `Cultural_Voyagers_Birthdays_${getTodayFormatted(0)}.csv`);
@@ -609,26 +656,50 @@
       showNotification('Excel sheet downloaded successfully!', 'success');
     }
 
+    // Splits one CSV line into columns, respecting "quoted, values"
+    function parseCSVLine(line) {
+      const cols = [];
+      let cur = '';
+      let inQuotes = false;
+      for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        if (inQuotes) {
+          if (ch === '"' && line[i + 1] === '"') { cur += '"'; i++; }
+          else if (ch === '"') { inQuotes = false; }
+          else { cur += ch; }
+        } else if (ch === '"') {
+          inQuotes = true;
+        } else if (ch === ',') {
+          cols.push(cur.trim());
+          cur = '';
+        } else {
+          cur += ch;
+        }
+      }
+      cols.push(cur.trim());
+      return cols;
+    }
+
     function importCSV(event) {
       const file = event.target.files[0];
       if (!file) return;
       const reader = new FileReader();
       reader.onload = function(e) {
-        const text = e.target.result;
-        const lines = text.split('\n');
+        const text = String(e.target.result || '').replace(/^\uFEFF/, '');
+        const lines = text.split(/\r?\n/);
         let addedCount = 0;
         let records = getStoredRecords();
         for (let i = 1; i < lines.length; i++) {
           const line = lines[i].trim();
           if (!line) continue;
-          const cols = line.split(',').map(c => c.replace(/^"|"$/g, '').trim());
+          const cols = parseCSVLine(line);
           if (cols.length >= 4) {
             const name = cols[1] || cols[0];
             const email = cols[2] || cols[1];
             const dob = cols[3] || cols[2];
             const category = cols[4] || 'VIP Client';
             const amount = parseInt(cols[5], 10) || 5000;
-            if (name && dob) {
+            if (name && dob && parseDob(dob)) {
               records.push({ id: Date.now().toString() + Math.random().toString(36).substr(2, 4), name, email, dob, category, amount });
               addedCount++;
             }
@@ -690,21 +761,21 @@
           <div class="flex items-center space-x-4">
             <div class="relative">
               <div class="w-14 h-14 rounded-full bg-gradient-to-tr from-amber-400 to-orange-500 flex items-center justify-center font-bold text-slate-950 text-lg shadow-md">
-                ${r.name.substring(0, 2).toUpperCase()}
+                ${escapeHtml(String(r.name).substring(0, 2).toUpperCase())}
               </div>
               <span class="absolute -bottom-1 -right-1 bg-amber-400 text-slate-950 text-[10px] font-extrabold px-1.5 py-0.5 rounded-full uppercase">Stamp</span>
             </div>
             <div>
-              <h3 class="font-serif font-bold text-white text-base">${r.name}</h3>
-              <p class="text-xs text-slate-400">${r.email}</p>
+              <h3 class="font-serif font-bold text-white text-base">${escapeHtml(r.name)}</h3>
+              <p class="text-xs text-slate-400">${escapeHtml(r.email)}</p>
               <div class="flex items-center space-x-2 mt-1">
-                <span class="text-[11px] font-semibold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20">${r.category}</span>
+                <span class="text-[11px] font-semibold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20">${escapeHtml(r.category)}</span>
                 <span class="text-[11px] text-slate-400">DOB: ${formatDateDisplay(r.dob)}</span>
               </div>
             </div>
           </div>
           <div class="flex sm:flex-col gap-2 w-full sm:w-auto">
-            <button onclick="openInviteDrawer('${r.id}')" class="flex-1 sm:flex-none px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs shadow-glow-gold transition">
+            <button onclick="openInviteDrawer('${escapeHtml(r.id)}')" class="flex-1 sm:flex-none px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs shadow-glow-gold transition">
               <i class="fa-solid fa-paper-plane mr-1"></i> SEND WISH
             </button>
           </div>
@@ -718,7 +789,7 @@
       const searchVal = document.getElementById('searchInput').value.toLowerCase().trim();
 
       let filtered = records.filter(r => {
-        const matchesSearch = r.name.toLowerCase().includes(searchVal) || r.email.toLowerCase().includes(searchVal) || (r.category && r.category.toLowerCase().includes(searchVal));
+        const matchesSearch = String(r.name || '').toLowerCase().includes(searchVal) || String(r.email || '').toLowerCase().includes(searchVal) || (r.category && r.category.toLowerCase().includes(searchVal));
         const daysLeft = calculateDaysLeft(r.dob);
         if (!matchesSearch) return false;
         if (currentCategoryFilter === 'TODAY') return daysLeft === 0;
@@ -743,23 +814,26 @@
         } else {
           daysBadge = `<span class="text-xs text-slate-400 font-mono">${daysLeft} days</span>`;
         }
+        const safeId = escapeHtml(r.id);
         return `
           <tr class="hover:bg-slate-800/40 transition group">
-            <td class="py-3.5 px-4 font-semibold text-white flex items-center space-x-3">
-              <div class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xs text-amber-400 font-bold">${r.name.substring(0, 2).toUpperCase()}</div>
-              <span>${r.name}</span>
+            <td class="py-3.5 px-4 font-semibold text-white">
+              <div class="flex items-center space-x-3">
+                <div class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xs text-amber-400 font-bold">${escapeHtml(String(r.name).substring(0, 2).toUpperCase())}</div>
+                <span>${escapeHtml(r.name)}</span>
+              </div>
             </td>
-            <td class="py-3.5 px-4 text-slate-400 text-xs">${r.email}</td>
-            <td class="py-3.5 px-4"><span class="px-2 py-0.5 rounded text-[11px] font-medium bg-slate-800 text-slate-300 border border-slate-700">${r.category}</span></td>
+            <td class="py-3.5 px-4 text-slate-400 text-xs">${escapeHtml(r.email)}</td>
+            <td class="py-3.5 px-4"><span class="px-2 py-0.5 rounded text-[11px] font-medium bg-slate-800 text-slate-300 border border-slate-700">${escapeHtml(r.category)}</span></td>
             <td class="py-3.5 px-4 text-xs font-mono font-bold text-amber-300">PKR ${getRecordAmount(r).toLocaleString()}</td>
             <td class="py-3.5 px-4 text-xs font-mono text-slate-300">${formatDateDisplay(r.dob)}</td>
             <td class="py-3.5 px-4">${daysBadge}</td>
             <td class="py-3.5 px-4 text-right space-x-1.5">
-              <button onclick="openInviteDrawer('${r.id}')" class="px-2.5 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs font-semibold transition" title="Generate Wish Letter & Voucher">
+              <button onclick="openInviteDrawer('${safeId}')" class="px-2.5 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs font-semibold transition" title="Generate Wish Letter & Voucher">
                 <i class="fa-solid fa-paper-plane mr-1"></i> SEND WISH
               </button>
-              <button onclick="editRecord('${r.id}')" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition" title="Edit Record"><i class="fa-solid fa-pen text-xs"></i></button>
-              <button onclick="deleteRecord('${r.id}')" class="p-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 transition" title="Delete Record"><i class="fa-solid fa-trash text-xs"></i></button>
+              <button onclick="editRecord('${safeId}')" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition" title="Edit Record"><i class="fa-solid fa-pen text-xs"></i></button>
+              <button onclick="deleteRecord('${safeId}')" class="p-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 transition" title="Delete Record"><i class="fa-solid fa-trash text-xs"></i></button>
             </td>
           </tr>
         `;
@@ -796,6 +870,7 @@
       } else {
         records.push({ id: Date.now().toString(), name, email, dob, category, amount });
         showNotification('New Voyager registered to ledger!', 'success');
+        triggerConfetti();
       }
       saveStoredRecords(records);
       resetForm();
@@ -803,9 +878,9 @@
 
     function editRecord(id) {
       const records = getStoredRecords();
-      const r = records.find(item => item.id === id);
+      const r = records.find(item => String(item.id) === String(id));
       if (!r) return;
-      currentEditingId = id;
+      currentEditingId = r.id;
       document.getElementById('inputName').value = r.name;
       document.getElementById('inputEmail').value = r.email;
       document.getElementById('inputDob').value = r.dob;
@@ -819,7 +894,7 @@
     function deleteRecord(id) {
       if (confirm('Are you sure you want to remove this record from the ledger?')) {
         let records = getStoredRecords();
-        records = records.filter(r => r.id !== id);
+        records = records.filter(r => String(r.id) !== String(id));
         saveStoredRecords(records);
         showNotification('Record removed from ledger', 'info');
       }
@@ -837,7 +912,7 @@
 
     function openInviteDrawer(id) {
       const records = getStoredRecords();
-      const r = records.find(item => item.id === id);
+      const r = records.find(item => String(item.id) === String(id));
       if (!r) return;
 
       const amount = getRecordAmount(r);
@@ -845,7 +920,7 @@
 
       document.getElementById('drawerRecipientName').innerText = r.name;
       document.getElementById('drawerRecipientEmail').innerText = r.email;
-      document.getElementById('drawerAvatar').innerText = r.name.substring(0, 2).toUpperCase();
+      document.getElementById('drawerAvatar').innerText = String(r.name).substring(0, 2).toUpperCase();
 
       const voucherCode = `CV-BDAY-${r.name.replace(/\s+/g, '').toUpperCase()}-2026`;
       currentVoucherCode = voucherCode;
@@ -871,9 +946,9 @@
       }
 
       document.getElementById('drawerLetterPreview').innerHTML = `
-        <p>Dear <strong class="text-amber-400">${r.name}</strong>,</p>
+        <p>Dear <strong class="text-amber-400">${escapeHtml(r.name)}</strong>,</p>
         <p>Warmest wishes from Cultural Voyagers on your special day!</p>
-        <p>As a valued <strong>${r.category}</strong>, we are delighted to present you with an exclusive <strong>${amountDisplay} Luxury Travel Voucher</strong> for your next journey.</p>
+        <p>As a valued <strong>${escapeHtml(r.category)}</strong>, we are delighted to present you with an exclusive <strong>${amountDisplay} Luxury Travel Voucher</strong> for your next journey.</p>
         <p class="text-slate-400 italic">"May your upcoming year be filled with unforgettable destinations and rich experiences."</p>
       `;
 
@@ -951,6 +1026,8 @@ Cultural Voyagers Team`;
       }
       navigator.clipboard.writeText(currentVoucherCode).then(() => {
         showNotification('Voucher Code Copied!', 'success');
+      }).catch(() => {
+        showNotification('Copy failed — please copy the code manually.', 'info');
       });
     }
 
@@ -964,7 +1041,9 @@ Cultural Voyagers Team`;
     function copyToClipboard(elementId, successMsg) {
       const elem = document.getElementById(elementId);
       const textToCopy = elem.value || elem.innerText;
-      navigator.clipboard.writeText(textToCopy).then(() => { showNotification(successMsg, 'success'); });
+      navigator.clipboard.writeText(textToCopy).then(() => { showNotification(successMsg, 'success'); }).catch(() => {
+        showNotification('Copy failed.', 'info');
+      });
     }
 
     function showNotification(message, type = 'success') {
@@ -977,7 +1056,8 @@ Cultural Voyagers Team`;
         : `<i class="fa-solid fa-circle-info text-amber-400 text-base"></i>`;
       toast.classList.remove('translate-y-20', 'opacity-0');
       toast.classList.add('translate-y-0', 'opacity-100');
-      setTimeout(() => {
+      clearTimeout(showNotification._t);
+      showNotification._t = setTimeout(() => {
         toast.classList.remove('translate-y-0', 'opacity-100');
         toast.classList.add('translate-y-20', 'opacity-0');
       }, 3000);
@@ -993,6 +1073,21 @@ Cultural Voyagers Team`;
       triggerConfetti();
       showNotification('Cultural Voyagers Registry Active', 'info');
     }
+
+    // Ripple effect on every button / link press
+    document.addEventListener('click', (e) => {
+      const target = e.target.closest('button, a[target="_blank"], label[title="Import CSV"]');
+      if (!target) return;
+      const rect = target.getBoundingClientRect();
+      const size = Math.max(rect.width, rect.height);
+      const dot = document.createElement('span');
+      dot.className = 'ripple-dot';
+      dot.style.width = dot.style.height = size + 'px';
+      dot.style.left = (e.clientX - rect.left - size / 2) + 'px';
+      dot.style.top = (e.clientY - rect.top - size / 2) + 'px';
+      target.appendChild(dot);
+      setTimeout(() => dot.remove(), 600);
+    });
 
     document.addEventListener('DOMContentLoaded', () => {
       renderApp();
